@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="red">#DD2C00</color>
+    <color name="orange">#FFAB00</color>
+    <color name="green">#64DD17</color>
+    <color name="sky">#00B8D4</color>
+    <color name="violate">#AA00FF</color>
+    <color name="violate_lite">#650595</color>
+    <color name="violate_mid">#3B0257</color>
+    <color name="violate_end">#180124</color>
+    <color name="violate_dark">#11001A</color>
+    <color name="sky_light_">#E3F2FD</color>
+    <color name="transparent">#00FFFFFF</color>
+    <color name="ash">#FF282C34</color>
+</resources>

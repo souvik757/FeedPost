@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">FeedPost</string>
+    // string resources
+    <string name="useremail">email</string>
+    <string name="password">password</string>
+    <string name="signin">sign in</string>
+    <string name="signup">sign up</string>
+    <string name="first">first name</string>
+    <string name="last">last name</string>
+    <string name="select">select</string>
+    <string name="done">next</string>
+    <string name="message">type here . . .</string>
+</resources>

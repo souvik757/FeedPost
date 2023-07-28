@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/ash"
+    tools:context=".Content.HomePage">
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/transparent">
+        <androidx.appcompat.widget.Toolbar
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:background="@drawable/feedpost"
+                android:layout_width="40dp"
+                android:layout_height="35dp"/>
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Welcome to FeedPost !"/>
+        </androidx.appcompat.widget.Toolbar>
+        <com.google.android.material.button.MaterialButton
+            android:onClick="navigateToUsersList"
+            android:text="see people"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_margin="50dp"
+            android:gravity="center"/>
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+</ScrollView>
