@@ -1,15 +1,20 @@
 package com.example.feedpost.Content.UsersList;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.feedpost.OthersProfile.OthersProfileActivity;
 import com.example.feedpost.R;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textview.MaterialTextView;
 
 import java.util.ArrayList;
@@ -23,7 +28,7 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.ViewHo
         this.dataLists = dataLists;
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder{
 
         private ImageView profileImageView ;
         private MaterialTextView profileNameView ;
@@ -33,7 +38,6 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.ViewHo
             profileImageView = itemView.findViewById(R.id.profileIMG) ;
             profileNameView  = itemView.findViewById(R.id.profileUserName) ;
         }
-
     }
     @NonNull
     @Override
@@ -50,6 +54,16 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.ViewHo
 
         holder.profileImageView.setImageResource(dataModel.getProfilePic());
         holder.profileNameView.setText(dataModel.getProfileName());
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // show users uploaded images and activities on realtime data channel
+                String userName = dataLists.get(holder.getAdapterPosition()).getProfileName() ;
+                Intent tappedUser = new Intent(context , OthersProfileActivity.class) ;
+                tappedUser.putExtra("TappedUsersName" , userName) ;
+                context.startActivity(tappedUser) ;
+            }
+        });
     }
 
     @Override

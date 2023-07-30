@@ -1,5 +1,8 @@
 package com.example.feedpost.Content.UsersList;
 
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
+
 public class UserListModel {
     private int profilePic ;
     private String profileName ;

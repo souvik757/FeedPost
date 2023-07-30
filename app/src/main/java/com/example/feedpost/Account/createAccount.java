@@ -42,7 +42,7 @@ public class createAccount extends AppCompatActivity {
     // firebase
     private FirebaseAuth mAuth ;
     private FirebaseFirestore mDatabase ;
-    private DatabaseReference mRealDatabase ;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,14 +66,13 @@ public class createAccount extends AppCompatActivity {
     private void initializeDatabase(){
         mAuth = FirebaseAuth.getInstance() ;
         mDatabase = FirebaseFirestore.getInstance() ;
-        mRealDatabase = FirebaseDatabase.getInstance().getReference() ;
     }
     // 3 .
     private void setSpinnerItems(){
         final String[] contents = new String[]{
+                "skip" ,
                 "male" ,
-                "female" ,
-                "skip"
+                "female"
         } ;
         ArrayAdapter add = new ArrayAdapter(createAccount.this ,
                 android.R.layout.simple_spinner_dropdown_item , contents) ;
@@ -105,6 +104,11 @@ public class createAccount extends AppCompatActivity {
                     showCustomToast("Invalid last name");
                     return ;
                 }
+                if(spinner.getSelectedItem().toString().isEmpty()){
+                    // show custom toast
+                    showCustomToast("Invalid gender");
+                    return ;
+                }
                 String firstName = String.valueOf(fName.getText()) ;
                 String lastName = String.valueOf(lName.getText()) ;
                 String fullName = extract.getName(firstName,lastName) ;
@@ -125,11 +129,7 @@ public class createAccount extends AppCompatActivity {
                                 @Override
                                 public void onSuccess(Void unused) {
                                     // show custom toast
-                                    showCustomToast("Now , We have your information");
-                                    // create in realtime
-                                    mRealDatabase.child("users").child(childPath).child("email").setValue(usermail) ;
-                                    mRealDatabase.child("users").child(childPath).child("name").setValue(fullName) ;
-                                    mRealDatabase.child("users").child(childPath).child("gender").setValue(gender) ;
+                                    showCustomToast("Now , you can log in");
                                 }
                             }) ;
                         }

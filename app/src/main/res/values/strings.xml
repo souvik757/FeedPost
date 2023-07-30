@@ -10,4 +10,12 @@
     <string name="select">select</string>
     <string name="done">next</string>
     <string name="message">type here . . .</string>
+
+    <string name="connect">connect</string>
+    <string name="disconnect">disconnect</string>
+    <string name="follow">follow</string>
+    <string name="unfollow">unfollow</string>
+    <string name="text">text</string>
+    <string name="uploads">uploads</string>
+    <string name="Post">Posts</string>
 </resources>

@@ -19,6 +19,12 @@
         android:theme="@style/Theme.FeedPost"
         tools:targetApi="31">
         <activity
+            android:name=".ImageActivity"
+            android:exported="false" />
+        <activity
+            android:name=".OthersProfile.OthersProfileActivity"
+            android:exported="false" />
+        <activity
             android:name=".Content.UsersList.chooseUserActivity"
             android:exported="false" />
         <activity

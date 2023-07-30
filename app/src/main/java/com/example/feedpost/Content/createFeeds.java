@@ -26,8 +26,16 @@ import android.widget.Toast;
 
 import com.example.feedpost.Content.UsersList.chooseUserActivity;
 import com.example.feedpost.R;
+import com.example.feedpost.Utility.documentFields;
+import com.example.feedpost.Utility.extract;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.UploadTask;
 
@@ -43,6 +51,9 @@ public class createFeeds extends AppCompatActivity {
     private ProgressBar progressBar ;
     // firebase
     private FirebaseStorage mStorage ;
+    private FirebaseAuth mAuth ;
+    private FirebaseFirestore mFirestore ;
+    private DocumentReference mReference ;
     private final String fileName = UUID.randomUUID().toString()+".jpg" ;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +74,9 @@ public class createFeeds extends AppCompatActivity {
     }
     // 2 .
     private void initializeDatabase(){
+        mAuth = FirebaseAuth.getInstance() ;
         mStorage = FirebaseStorage.getInstance() ;
+        mFirestore = FirebaseFirestore.getInstance() ;
     }
     // 3 .
     private void onClickEvents(){
@@ -80,33 +93,46 @@ public class createFeeds extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 progressBar.setVisibility(View.VISIBLE);
-                // Get the data from an ImageView as bytes
-                choosePost.setDrawingCacheEnabled(true);
-                choosePost.buildDrawingCache();
-                Bitmap bitmap = ((BitmapDrawable) choosePost.getDrawable()).getBitmap();
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-                byte[] data = baos.toByteArray();
-                UploadTask uploadTask = mStorage.getReference().child("images")
-                        .child(fileName).putBytes(data);
-                uploadTask.addOnFailureListener(new OnFailureListener() {
+                String UID = mAuth.getCurrentUser().getUid() ;
+                String email = mAuth.getCurrentUser().getEmail() ;
+                String extractID = extract.getDocument(email) ;
+                mReference = mFirestore.collection(extractID).document(UID) ;
+
+                mReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        // Handle unsuccessful uploads
-                        progressBar.setVisibility(View.GONE);
-                        showCustomToast("Something went wrong");
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        if(documentSnapshot.exists()){
+                            String name = documentSnapshot.getString(documentFields.UserName) ;
+                            // Get the data from an ImageView as bytes
+                            choosePost.setDrawingCacheEnabled(true);
+                            choosePost.buildDrawingCache();
+                            Bitmap bitmap = ((BitmapDrawable) choosePost.getDrawable()).getBitmap();
+                            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                            byte[] data = baos.toByteArray();
+                            UploadTask uploadTask = mStorage.getReference().child("userUploads").child(name)
+                                    .child(fileName).putBytes(data);
+                            uploadTask.addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception exception) {
+                                    // Handle unsuccessful uploads
+                                    progressBar.setVisibility(View.GONE);
+                                    showCustomToast("Something went wrong");
+                                }
+                            }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                @Override
+                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                    // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
+                                    // ...
+                                    progressBar.setVisibility(View.GONE);
+                                    // go to all users list
+                                    startActivity(new Intent(createFeeds.this , chooseUserActivity.class));
+                                    finish() ;
+                                }
+                            });
+                        }
                     }
-                }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
-                        // ...
-                        progressBar.setVisibility(View.GONE);
-                        // go to all users list
-                        startActivity(new Intent(createFeeds.this , chooseUserActivity.class));
-                        finish() ;
-                    }
-                });
+                }) ;
             }
         });
     }
@@ -141,6 +167,21 @@ public class createFeeds extends AppCompatActivity {
             }
         }
     }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+
+    }
+
     //  .
     private void showCustomToast(String message){
         LayoutInflater inflater = getLayoutInflater() ;

@@ -17,12 +17,19 @@ import android.widget.Toast;
 
 import com.example.feedpost.Content.HomePage;
 import com.example.feedpost.R;
+import com.example.feedpost.Utility.documentFields;
 import com.example.feedpost.Utility.extract;
 import com.example.feedpost.spalashScreen;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class MainActivity extends AppCompatActivity {
     // widgets
@@ -31,6 +38,8 @@ public class MainActivity extends AppCompatActivity {
     private Button signIn ;
     // firebase
     private FirebaseAuth mAuth ;
+    private DatabaseReference mRealDatabase ;
+    private DocumentReference mReference ;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,13 +50,14 @@ public class MainActivity extends AppCompatActivity {
         initializeDatabase() ;
         // showConsent ?
         showConsent() ;
+        onCLickEvents() ;
     }
     private void showConsent(){
         // showSplash
         if(mAuth.getCurrentUser() == null) {
             startActivity(new Intent(MainActivity.this, spalashScreen.class));
             // perform onclick events
-            onCLickEvents() ;
+
         }
         else {
             // go to content's page directly
@@ -64,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
     // 2 .
     private void initializeDatabase(){
         mAuth = FirebaseAuth.getInstance() ;
+        mRealDatabase = FirebaseDatabase.getInstance().getReference() ;
     }
     // 3 .
     private void onCLickEvents(){
@@ -88,6 +99,19 @@ public class MainActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if(task.isSuccessful()){
                             assert mAuth.getCurrentUser() != null ;
+                            String email = extract.getDocument(mAuth.getCurrentUser().getEmail()) ;
+                            String UID = mAuth.getCurrentUser().getUid() ;
+                            mReference = FirebaseFirestore.getInstance().collection(email).document(UID);
+                            mReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                @Override
+                                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                    if (documentSnapshot.exists()){
+                                        String userFullName = documentSnapshot.getString(documentFields.UserName) ;
+                                        String userGender = documentSnapshot.getString(documentFields.Gender) ;
+                                        setEntryInToRealtime(useremail , userFullName , userGender) ;
+                                    }
+                                }
+                            }) ;
                             navigateToHomepage() ;
                         }
                         else {
@@ -100,6 +124,14 @@ public class MainActivity extends AppCompatActivity {
                 }) ;
             }
         });
+    }
+    // 4 .
+    private void setEntryInToRealtime(String usermail, String fullName , String gender){
+        String childPath = mAuth.getCurrentUser().getUid() ;
+        // create in realtime
+        mRealDatabase.child("users").child(childPath).child("email").setValue(usermail) ;
+        mRealDatabase.child("users").child(childPath).child("name").setValue(fullName) ;
+        mRealDatabase.child("users").child(childPath).child("gender").setValue(gender) ;
     }
     private void navigateToHomepage(){
         String documentPath = extract.getDocument(String.valueOf(userEmail)) ;
