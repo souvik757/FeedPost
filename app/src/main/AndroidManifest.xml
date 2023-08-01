@@ -19,7 +19,7 @@
         android:theme="@style/Theme.FeedPost"
         tools:targetApi="31">
         <activity
-            android:name=".ImageActivity"
+            android:name=".ImageActivity.ImageActivity"
             android:exported="false" />
         <activity
             android:name=".OthersProfile.OthersProfileActivity"
@@ -31,9 +31,9 @@
             android:name=".Content.createFeeds"
             android:exported="false" />
         <activity
-            android:name=".Content.HomePage"
+            android:name=".Content.HomePage.HomePage"
             android:exported="false"
-            android:theme="@style/Theme.Material3.Dark" />
+            android:screenOrientation="portrait" />
         <activity
             android:name=".Account.createAccount"
             android:exported="false" />

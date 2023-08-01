@@ -45,28 +45,37 @@
                 android:textColorHint="@color/sky_light_"
                 android:layout_marginEnd="12dp"/>
         </com.google.android.material.appbar.MaterialToolbar>
-        <EditText
-            android:id="@+id/usernameETSignUp"
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="70dp"
-            android:layout_gravity="center"
-            android:layout_margin="16dp"
-            android:hint="@string/useremail"
-            android:inputType="textEmailAddress"
-            android:padding="12dp"
-            android:textColor="@color/white"
-            android:textColorHint="@color/sky_light_" />
-        <EditText
-            android:id="@+id/passwordETSignUp"
-            android:inputType="textPassword"
+            android:layout_height="wrap_content">
+            <EditText
+                android:id="@+id/usernameETSignUp"
+                android:layout_width="match_parent"
+                android:layout_height="70dp"
+                android:layout_gravity="center"
+                android:layout_margin="16dp"
+                android:hint="@string/useremail"
+                android:inputType="textEmailAddress"
+                android:padding="12dp"
+                android:textColor="@color/white"
+                android:textColorHint="@color/sky_light_" />
+        </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="70dp"
-            android:padding="12dp"
-            android:layout_margin="16dp"
-            android:layout_gravity="center"
-            android:textColor="@color/white"
-            android:hint="@string/password"
-            android:textColorHint="@color/sky_light_"/>
+            android:layout_height="wrap_content"
+            app:passwordToggleEnabled="true">
+            <EditText
+                android:id="@+id/passwordETSignUp"
+                android:inputType="textPassword"
+                android:layout_width="match_parent"
+                android:layout_height="70dp"
+                android:padding="12dp"
+                android:layout_margin="16dp"
+                android:layout_gravity="center"
+                android:textColor="@color/white"
+                android:hint="@string/password"
+                android:textColorHint="@color/sky_light_"/>
+        </com.google.android.material.textfield.TextInputLayout>
         <androidx.appcompat.widget.AppCompatSpinner
             android:id="@+id/spinner"
             android:layout_margin="10dp"

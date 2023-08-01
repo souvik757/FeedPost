@@ -56,9 +56,7 @@ public class chooseUserActivity extends AppCompatActivity {
         initializeDatabase() ;
         fillListWithData() ;
         initializeAdapter() ;
-
     }
-
     // 1 .
     private void initializeWidgetsAndVariables(){
         usersList = findViewById(R.id.usersCardView) ;
@@ -97,13 +95,11 @@ public class chooseUserActivity extends AppCompatActivity {
                                     if(gender.equals("skip") || gender.isEmpty())
                                         userListModel.setProfilePic(R.drawable.skip) ;
                                     usersDataList.add(userListModel) ;
-
-                                    loadingBar.setVisibility(View.GONE);
+                                    loadingBar.setVisibility(View.GONE) ;
                                     adapter.notifyDataSetChanged() ;
                                 }
                             }
                         }
-
                         @Override
                         public void onCancelled(@NonNull DatabaseError error) {
 
@@ -112,7 +108,6 @@ public class chooseUserActivity extends AppCompatActivity {
                 }
             }
         }) ;
-
     }
     // 4 .
     private void initializeAdapter(){
@@ -122,7 +117,6 @@ public class chooseUserActivity extends AppCompatActivity {
         usersList.setLayoutManager(layoutManager) ;
         usersList.setAdapter(adapter) ;
     }
-
     private void showCustomToast(String message){
         LayoutInflater inflater = getLayoutInflater() ;
         View layout = inflater.inflate(R.layout.custom_toast_layout , (ViewGroup) findViewById(R.id.containerToast)) ;
