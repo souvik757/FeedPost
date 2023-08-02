@@ -18,15 +18,20 @@
     <string name="text">text</string>
     <string name="uploads">uploads</string>
     <string name="Post">Posts</string>
+    <string name="logout">logout</string>
 
     <string name="feedPost">FeedPost</string>
     <string name="home">Home</string>
     <string name="profile">Profile</string>
+
+    <string name="posts">posts</string>
+    <string name="followers">followers</string>
+    <string name="following">following</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="greet">Welcome to FeedPost !</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    
+
     <string name="drawer_open">Open</string>
     <string name="drawer_close">Close</string>
 </resources>

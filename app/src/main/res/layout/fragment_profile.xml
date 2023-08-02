@@ -16,11 +16,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/editButton"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:layout_marginStart="12dp"
+                android:layout_marginEnd="12dp"
                 android:layout_marginTop="12dp"
-                android:background="@drawable/back"/>
+                android:layout_alignParentRight="true"
+                android:background="@drawable/editprofile"/>
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="180dp"
@@ -32,9 +34,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="100dp">
                 <ImageView
+                    android:id="@+id/profileDP"
+                    android:src="@drawable/addimage"
                     android:layout_width="100dp"
                     android:layout_height="100dp"
-                    android:background="@color/violate_mid"
+                    android:background="@color/transparent"
                     android:layout_marginStart="30dp"/>
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -44,7 +48,6 @@
                     android:background="@color/transparent">
                     <TextView
                         android:id="@+id/userName"
-                        android:text="name"
                         android:textSize="20sp"
                         android:textColor="@color/white"
                         android:textStyle="bold"
@@ -52,7 +55,6 @@
                         android:layout_height="wrap_content"/>
                     <TextView
                         android:id="@+id/userPronounce"
-                        android:text="(he/she)"
                         android:textSize="12sp"
                         android:textColor="@color/sky"
                         android:layout_width="wrap_content"
@@ -68,6 +70,86 @@
                 android:layout_marginStart="30dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
+            <LinearLayout
+                android:id="@+id/layout2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:layout_gravity="center"
+                android:layout_centerHorizontal="true"
+                android:layout_below="@+id/userBio"
+                android:orientation="horizontal"
+                android:background="@color/transparent">
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:background="@color/transparent">
+                    <TextView
+                        android:id="@+id/postNumber"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:textColor="@color/white"/>
+                    <com.google.android.material.button.MaterialButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/posts"
+                        android:textColor="@color/black"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:orientation="vertical"
+                    android:background="@color/transparent">
+                    <TextView
+                        android:id="@+id/followerNumber"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:textColor="@color/white"/>
+                    <com.google.android.material.button.MaterialButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/followers"
+                        android:textColor="@color/black"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:background="@color/transparent">
+                    <TextView
+                        android:id="@+id/followingNumber"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:textColor="@color/white"/>
+                    <com.google.android.material.button.MaterialButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/following"
+                        android:textColor="@color/black"/>
+                </LinearLayout>
+            </LinearLayout>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/usersPhotoGalary"
+                android:background="@color/transparent"
+                android:layout_marginTop="12dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/layout2"
+                android:layout_centerHorizontal="true"/>
+            <ProgressBar
+                android:id="@+id/photoFetching"
+                android:visibility="gone"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
+                android:layout_marginTop="90dp"
+                android:layout_below="@+id/layout2"
+                android:layout_centerHorizontal="true"/>
         </RelativeLayout>
     </ScrollView>
 

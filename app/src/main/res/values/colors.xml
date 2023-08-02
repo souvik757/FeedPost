@@ -6,7 +6,8 @@
     <color name="orange">#FFAB00</color>
     <color name="green">#64DD17</color>
     <color name="sky">#00B8D4</color>
-    <color name="violate">#AA00FF</color>
+    <color name="violate">#CB88EC</color>
+    <color name="violate_text">#AA00FF</color>
     <color name="violate_lite">#650595</color>
     <color name="violate_mid">#3B0257</color>
     <color name="violate_end">#180124</color>

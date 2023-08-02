@@ -66,6 +66,7 @@ public class OthersProfileActivity extends AppCompatActivity {
         profileName = findViewById(R.id.usersProfileName) ;
         userGender = findViewById(R.id.usersProfileGender) ;
         profilePic = findViewById(R.id.usersProfilePic) ;
+
         imageList = new ArrayList<>() ;
         adapter = new ImageAdapter(imageList , this) ;
         GridLayoutManager layoutManager = new GridLayoutManager(this , 3) ;
