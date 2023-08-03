@@ -18,7 +18,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.feedpost.Account.logOut;
+import com.example.feedpost.Account.EditProfileActivity;
 import com.example.feedpost.OthersProfile.ImageAdapter;
 import com.example.feedpost.R;
 import com.example.feedpost.Utility.documentFields;
@@ -26,8 +26,6 @@ import com.example.feedpost.Utility.extract;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -155,7 +153,7 @@ public class ProfileFragment extends Fragment {
         edit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getActivity().startActivity(new Intent(getContext() , logOut.class)) ;
+                getActivity().startActivity(new Intent(getContext() , EditProfileActivity.class)) ;
             }
         });
     }

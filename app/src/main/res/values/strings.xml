@@ -19,6 +19,8 @@
     <string name="uploads">uploads</string>
     <string name="Post">Posts</string>
     <string name="logout">logout</string>
+    <string name="login">login</string>
+    <string name="Acc..">Account and Preferences</string>
 
     <string name="feedPost">FeedPost</string>
     <string name="home">Home</string>

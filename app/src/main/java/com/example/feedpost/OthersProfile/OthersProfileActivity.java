@@ -121,15 +121,15 @@ public class OthersProfileActivity extends AppCompatActivity {
                     if(name.equals(tempUser)){
                         if(gender.equals("male")) {
                             tempUserGender = "(he/him)";
-                            profilePic.setBackground(getDrawable(R.drawable.male)) ;
+                            profilePic.setImageResource(R.drawable.male) ;
                         }
                         else if(gender.equals("female")) {
                             tempUserGender = "(she/her)";
-                            profilePic.setBackground(getDrawable(R.drawable.female)) ;
+                            profilePic.setImageResource(R.drawable.female) ;
                         }
                         else {
                             tempUserGender = " ";
-                            profilePic.setBackground(getDrawable(R.drawable.skip)) ;
+                            profilePic.setImageResource(R.drawable.skip) ;
                         }
                     }
                     userGender.setText(tempUserGender);
@@ -153,5 +153,9 @@ public class OthersProfileActivity extends AppCompatActivity {
         toast.setDuration(Toast.LENGTH_LONG) ;
         toast.setView(layout);
         toast.show() ;
+    }
+
+    public void finish(View view) {
+        finish() ;
     }
 }

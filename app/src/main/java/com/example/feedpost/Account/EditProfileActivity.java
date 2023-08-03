@@ -10,18 +10,27 @@ import android.view.View;
 import com.example.feedpost.R;
 import com.google.firebase.auth.FirebaseAuth;
 
-public class logOut extends AppCompatActivity {
+public class EditProfileActivity extends AppCompatActivity {
     // Firebase
     private FirebaseAuth mAuth ;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_log_out);
+        setContentView(R.layout.activity_edit_profile);
+
         initializeDatabase() ;
     }
     // 2 .
     private void initializeDatabase(){
         mAuth = FirebaseAuth.getInstance() ;
+    }
+    public void back(View view) {
+        finish() ;
+    }
+
+    public void signIn(View view) {
+        startActivity(new Intent(EditProfileActivity.this , MainActivity.class));
+        finish() ;
     }
 
     public void signOut(View view) {
@@ -29,7 +38,7 @@ public class logOut extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                startActivity(new Intent(logOut.this , MainActivity.class));
+                startActivity(new Intent(EditProfileActivity.this , MainActivity.class));
                 finish() ;
             }
         } , 200) ;
