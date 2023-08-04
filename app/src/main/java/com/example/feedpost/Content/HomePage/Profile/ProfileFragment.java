@@ -18,7 +18,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.feedpost.Account.EditProfileActivity;
+import com.example.feedpost.Account.EditProfile.EditProfileActivity;
 import com.example.feedpost.OthersProfile.ImageAdapter;
 import com.example.feedpost.R;
 import com.example.feedpost.Utility.documentFields;
@@ -26,6 +26,7 @@ import com.example.feedpost.Utility.extract;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -45,6 +46,7 @@ public class ProfileFragment extends Fragment {
     // widgets
     private Button edit ;
     private ImageView profilePicture ;
+    private ImageView profileVerified ;
     private TextView userName ;
     private TextView userGender ;
     private TextView userBio ;
@@ -124,6 +126,7 @@ public class ProfileFragment extends Fragment {
         edit = v.findViewById(R.id.editButton) ;
         // imageview
         profilePicture = v.findViewById(R.id.profileDP) ;
+        profileVerified = v.findViewById(R.id.verified) ;
         // textview
         userName = v.findViewById(R.id.userName) ;
         userGender = v.findViewById(R.id.userPronounce) ;
@@ -160,6 +163,10 @@ public class ProfileFragment extends Fragment {
     // 4 .
     private void setViewsAndResources(View view){
         // set resources
+        FirebaseUser user = mAuth.getCurrentUser() ;
+        user.reload() ;
+        if(user.isEmailVerified())
+            profileVerified.setImageResource(R.drawable.verified);
         String documentPath = extract.getDocument(mAuth.getCurrentUser().getEmail()) ;
         String UID = mAuth.getCurrentUser().getUid() ;
         mReference = FirebaseFirestore.getInstance().collection(documentPath).document(UID);
@@ -172,7 +179,7 @@ public class ProfileFragment extends Fragment {
                 userName.setText(currentUser) ;
                 if(currentUsersGender.equals("male")) {
                     userGender.setText("(he/him)");
-                    profilePicture.setBackground(getActivity().getDrawable(R.drawable.male));
+                    profilePicture.setImageResource(R.drawable.male) ;
                 }
                 else if(currentUsersGender.equals("female")) {
                     userGender.setText("(she/her)");
@@ -180,7 +187,7 @@ public class ProfileFragment extends Fragment {
                 }
                 else {
                     userGender.setText(" ");
-                    profilePicture.setBackground(getActivity().getDrawable(R.drawable.skip));
+                    profilePicture.setImageResource(R.drawable.skip) ;
                 }
                 storageReference.child(currentUser).listAll().addOnSuccessListener(new OnSuccessListener<ListResult>() {
                     @Override

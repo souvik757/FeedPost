@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/commonMargin"
+    android:theme="@style/Theme.Material3.Dark"
+    android:background="@drawable/dialoge_background">
+    <TextView
+        android:id="@+id/alertTxt"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:text="@string/alert"
+        android:textColor="@color/orange"
+        android:textSize="@dimen/commonText"
+        android:padding="@dimen/commonMargin"
+        android:background="@drawable/custom_title_dialoge"
+        android:layout_centerHorizontal="true"/>
+    <TextView
+        android:id="@+id/txtView"
+        android:layout_marginTop="20dp"
+        android:layout_below="@+id/alertTxt"
+        android:text="@string/loginas.."
+        android:textColor="@color/white"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/txtView">
+        <EditText
+            android:id="@+id/confirmation"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:textColor="@color/green"
+            android:hint="@string/confirm"
+            android:textColorHint="@color/white"
+            android:autofillHints="true"
+            android:inputType="text" />
+    </com.google.android.material.textfield.TextInputLayout>
+</RelativeLayout>

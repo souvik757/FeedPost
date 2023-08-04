@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/edit_profile_gradient"
-    tools:context=".Account.EditProfileActivity">
+    tools:context=".Account.EditProfile.EditProfileActivity">
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -84,13 +84,14 @@
                     android:layout_width="25dp"
                     android:layout_height="25dp"
                     android:background="@drawable/profile"/>
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/white"
-                    android:textSize="19sp"
                     android:layout_marginStart="8dp"
-                    android:text="Account"/>
+                    android:text="@string/account"
+                    android:textColor="@color/white"
+                    android:textSize="19sp" />
             </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
@@ -104,13 +105,13 @@
                 <ImageView
                     android:layout_width="25dp"
                     android:layout_height="25dp"
-                    android:background="@drawable/profile" />
+                    android:background="@drawable/personalize" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
-                    android:text="Accounts"
+                    android:text="@string/acc..edit.."
                     android:textColor="@color/white"
                     android:textSize="19sp" />
             </LinearLayout>
@@ -125,13 +126,35 @@
                 <ImageView
                     android:layout_width="25dp"
                     android:layout_height="25dp"
-                    android:background="@drawable/profile" />
+                    android:background="@drawable/editpass" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
-                    android:text="Accounts"
+                    android:text="@string/change..pass"
+                    android:textColor="@color/white"
+                    android:textSize="19sp" />
+            </LinearLayout>
+            <LinearLayout
+                android:onClick="sendVerification"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:background="@color/transparent">
+
+                <ImageView
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:background="@drawable/verified" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="@string/acc..verified"
                     android:textColor="@color/white"
                     android:textSize="19sp" />
             </LinearLayout>
@@ -146,34 +169,13 @@
                 <ImageView
                     android:layout_width="25dp"
                     android:layout_height="25dp"
-                    android:background="@drawable/profile" />
+                    android:background="@drawable/time_spent" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
-                    android:text="Accounts"
-                    android:textColor="@color/white"
-                    android:textSize="19sp" />
-            </LinearLayout>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
-                android:background="@color/transparent">
-
-                <ImageView
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
-                    android:background="@drawable/profile" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:text="Accounts"
+                    android:text="@string/acc..active.time"
                     android:textColor="@color/white"
                     android:textSize="19sp" />
             </LinearLayout>
@@ -226,7 +228,7 @@
                 <ImageView
                     android:layout_width="25dp"
                     android:layout_height="25dp"
-                    android:background="@drawable/profile"/>
+                    android:background="@drawable/logout"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

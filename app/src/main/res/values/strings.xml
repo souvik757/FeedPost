@@ -22,6 +22,16 @@
     <string name="login">login</string>
     <string name="Acc..">Account and Preferences</string>
 
+    <string name="account">account</string>
+    <string name="acc..edit..">personalize</string>
+    <string name="change..pass">change password</string>
+    <string name="acc..verified">get verified</string>
+    <string name="acc..active.time">time spent</string>
+
+    <string name="loginas..">To log in as other user\nYou have to sign out from current user</string>
+    <string name="confirm">Type confirm</string>
+    <string name="alert">Alert</string>
+
     <string name="feedPost">FeedPost</string>
     <string name="home">Home</string>
     <string name="profile">Profile</string>
