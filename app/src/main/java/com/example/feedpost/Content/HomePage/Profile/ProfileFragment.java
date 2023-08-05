@@ -178,11 +178,11 @@ public class ProfileFragment extends Fragment {
                 currentUsersGender = documentSnapshot.getString(documentFields.Gender) ;
                 userName.setText(currentUser) ;
                 if(currentUsersGender.equals("male")) {
-                    userGender.setText("(he/him)");
+                    userGender.setText(getResources().getString(R.string.malePronounce));
                     profilePicture.setImageResource(R.drawable.male) ;
                 }
                 else if(currentUsersGender.equals("female")) {
-                    userGender.setText("(she/her)");
+                    userGender.setText(getResources().getString(R.string.femalePronounce));
                     profilePicture.setImageResource(R.drawable.female) ;
                 }
                 else {

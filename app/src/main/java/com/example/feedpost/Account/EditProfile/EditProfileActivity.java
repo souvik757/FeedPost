@@ -65,6 +65,19 @@ public class EditProfileActivity extends AppCompatActivity {
         }) ;
     }
 
+    public void sendPasswordReset(View view) {
+        String email = String.valueOf(mAuth.getCurrentUser().getEmail()) ;
+        mAuth.sendPasswordResetEmail(email).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if(task.isSuccessful())
+                    showCustomToast( "password reset email sent", view);
+            }
+        }) ;
+    }
+    public void personalizeProfile(View view) {
+        startActivity(new Intent(EditProfileActivity.this, personalizeProfile.class));
+    }
     public void showAlertDialogButtonClicked(View view) {
         // Create an alert builder
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -87,7 +100,9 @@ public class EditProfileActivity extends AppCompatActivity {
         AlertDialog dialog = builder.create();
         dialog.show();
     }
+
     //  .
+
     private void showCustomToast(String message , View v){
         LayoutInflater inflater = getLayoutInflater() ;
         View layout = inflater.inflate(R.layout.custom_toast_layout , v.findViewById(R.id.containerToast)) ;

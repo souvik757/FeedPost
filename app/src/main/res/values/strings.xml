@@ -9,7 +9,13 @@
     <string name="last">last name</string>
     <string name="select">select</string>
     <string name="done">next</string>
+    <string name="ok">done</string>
     <string name="message">type here . . .</string>
+
+    <string name="Pronounce">(he/she)</string>
+    <string name="malePronounce">(he/him)</string>
+    <string name="femalePronounce">(she/her)</string>
+
 
     <string name="connect">connect</string>
     <string name="disconnect">disconnect</string>
@@ -19,10 +25,16 @@
     <string name="uploads">uploads</string>
     <string name="Post">Posts</string>
     <string name="logout">logout</string>
-    <string name="login">login</string>
+    <string name="login">login as</string>
     <string name="Acc..">Account and Preferences</string>
 
-    <string name="account">account</string>
+    <string name="account">edit account</string>
+    <string name="createPost">Create post</string>
+    <string name="editProfilePic">edit profile picture</string>
+    <string name="editProfileBG">edit profile background</string>
+    <string name="editBio">edit profile Bio</string>
+    <string name="BioHint">Type to add bio</string>
+    <string name="type">Type to add</string>
     <string name="acc..edit..">personalize</string>
     <string name="change..pass">change password</string>
     <string name="acc..verified">get verified</string>

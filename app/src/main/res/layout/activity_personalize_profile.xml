@@ -1,19 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/edit_profile_gradient"
-    tools:context=".Account.EditProfile.EditProfileActivity">
-
+    tools:context=".Account.EditProfile.personalizeProfile">
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/commonMargin"
         android:background="@color/transparent">
-
-
         <androidx.appcompat.widget.AppCompatButton
             android:layout_width="22dp"
             android:layout_height="22dp"
@@ -21,11 +19,11 @@
             android:layout_marginTop="10dp"
             android:background="@drawable/cancel"
             android:backgroundTint="@color/white"
-            android:onClick="back" />
+            android:onClick="backToPrev" />
 
 
         <LinearLayout
-            android:id="@+id/layout_1"
+            android:id="@+id/layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
@@ -53,215 +51,202 @@
             </LinearLayout>
         </LinearLayout>
 
-
-        <TextView
-            android:id="@+id/layout_2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/layout_1"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="12dp"
-            android:text="@string/Acc.."
-            android:textSize="18sp" />
-
-
         <LinearLayout
-            android:id="@+id/layout_3"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/layout_2"
-            android:layout_margin="@dimen/commonMargin"
+            android:id="@+id/contents"
+            android:layout_below="@+id/layout"
             android:background="@drawable/edit_profile_cards"
-            android:orientation="vertical">
-            <LinearLayout
-                android:onClick="personalizeProfile"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="@dimen/commonPadding"
-                android:layout_margin="@dimen/commonMargin"
-                android:background="?android:attr/selectableItemBackground">
-
-                <ImageView
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
-                    android:background="@drawable/personalize" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:text="@string/acc..edit.."
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/commonText" />
-                <RelativeLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-                    <ImageView
-                        android:background="@drawable/right_arrow"
-                        android:backgroundTint="@color/white"
-                        android:layout_marginTop="3dp"
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:layout_alignParentEnd="true"/>
-                </RelativeLayout>
-            </LinearLayout>
-
-            <LinearLayout
-                android:onClick="sendPasswordReset"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="@dimen/commonPadding"
-                android:layout_marginStart="@dimen/commonMargin"
-                android:layout_marginEnd="@dimen/commonMargin"
-                android:layout_marginBottom="@dimen/commonMargin"
-                android:background="?android:attr/selectableItemBackground">
-
-                <ImageView
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
-                    android:background="@drawable/editpass" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:text="@string/change..pass"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/commonText" />
-                <RelativeLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-                    <ImageView
-                        android:background="@drawable/right_arrow"
-                        android:backgroundTint="@color/white"
-                        android:layout_marginTop="3dp"
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:layout_alignParentEnd="true"/>
-                </RelativeLayout>
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="@dimen/commonPadding"
-                android:layout_marginStart="@dimen/commonMargin"
-                android:layout_marginEnd="@dimen/commonMargin"
-                android:layout_marginBottom="@dimen/commonMargin"
-                android:background="?android:attr/selectableItemBackground"
-                android:onClick="sendVerification">
-
-                <ImageView
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
-                    android:background="@drawable/verified" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:text="@string/acc..verified"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/commonText" />
-                <RelativeLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-                    <ImageView
-                        android:background="@drawable/right_arrow"
-                        android:backgroundTint="@color/white"
-                        android:layout_marginTop="3dp"
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:layout_alignParentEnd="true"/>
-                </RelativeLayout>
-            </LinearLayout>
-        </LinearLayout>
-
-
-        <TextView
-            android:id="@+id/layout_4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/layout_3"
-            android:layout_marginStart="16dp"
-            android:text="@string/login"
-            android:textSize="20sp" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/layout_4"
             android:layout_margin="@dimen/commonMargin"
-            android:background="@drawable/edit_profile_cards"
-            android:orientation="vertical">
-
+            android:padding="@dimen/commonPadding"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/commonMargin"
-                android:padding="@dimen/commonPadding"
-                android:background="?android:attr/selectableItemBackground"
-                android:onClick="signIn">
-
-                <ImageView
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
-                    android:background="@drawable/profile" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:text="@string/login"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/commonText" />
-                <RelativeLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-                    <ImageView
-                        android:background="@drawable/right_arrow"
-                        android:backgroundTint="@color/white"
-                        android:layout_marginTop="3dp"
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:layout_alignParentEnd="true"/>
-                </RelativeLayout>
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="70dp"
                 android:layout_marginStart="@dimen/commonMargin"
+                android:layout_marginTop="@dimen/commonMargin"
                 android:layout_marginEnd="@dimen/commonMargin"
-                android:layout_marginBottom="@dimen/commonMargin"
                 android:padding="@dimen/commonPadding"
                 android:background="?android:attr/selectableItemBackground"
-                android:onClick="signOut">
+                android:onClick="editProfilePic">
 
                 <ImageView
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
-                    android:background="@drawable/logout" />
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/edit" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
-                    android:text="@string/logout"
-                    android:textColor="@color/red"
+                    android:text="@string/editProfilePic"
+                    android:layout_gravity="center"
+                    android:textColor="@color/white"
                     android:textSize="@dimen/commonText"/>
                 <RelativeLayout
+                    android:layout_gravity="center"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content">
                     <ImageView
-                        android:background="@drawable/right_arrow"
+                        android:background="@drawable/pencil"
                         android:backgroundTint="@color/white"
                         android:layout_marginTop="3dp"
                         android:layout_width="20dp"
                         android:layout_height="20dp"
                         android:layout_alignParentEnd="true"/>
                 </RelativeLayout>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="70dp"
+                android:layout_marginStart="@dimen/commonMargin"
+                android:layout_marginEnd="@dimen/commonMargin"
+                android:padding="@dimen/commonPadding"
+                android:background="?android:attr/selectableItemBackground"
+                android:onClick="editProfileBackground">
+                <ImageView
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/picture" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="@string/editProfileBG"
+                    android:layout_gravity="center"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/commonText"/>
+                <RelativeLayout
+                    android:layout_gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                    <ImageView
+                        android:background="@drawable/pencil"
+                        android:backgroundTint="@color/white"
+                        android:layout_marginTop="3dp"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_alignParentEnd="true"/>
+                </RelativeLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:onClick="editUserProfileBio"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/commonMargin"
+                android:layout_marginEnd="@dimen/commonMargin"
+                android:padding="@dimen/commonPadding">
+                <ImageView
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:src="@drawable/bio"/>
+                <TextView
+                    android:text="@string/editBio"
+                    android:layout_marginStart="8dp"
+                    android:layout_gravity="center"
+                    android:textColor="@color/white"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/commonText"/>
+                <RelativeLayout
+                    android:layout_gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                    <ImageView
+                        android:background="@drawable/pencil"
+                        android:backgroundTint="@color/white"
+                        android:layout_marginTop="3dp"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_alignParentEnd="true"/>
+                </RelativeLayout>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="70dp"
+                android:layout_marginStart="@dimen/commonMargin"
+                android:layout_marginEnd="@dimen/commonMargin"
+                android:layout_marginBottom="@dimen/commonMargin"
+                android:padding="@dimen/commonPadding"
+                android:background="?android:attr/selectableItemBackground"
+                android:onClick="editUserPronounce">
+                <ImageView
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/gender" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="@string/Pronounce"
+                    android:layout_gravity="center"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/commonText"/>
+                <RelativeLayout
+                    android:layout_gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                    <ImageView
+                        android:background="@drawable/pencil"
+                        android:backgroundTint="@color/white"
+                        android:layout_marginTop="3dp"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_alignParentEnd="true"/>
+                </RelativeLayout>
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/genderLayout"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="70dp"
+                android:layout_marginStart="@dimen/commonMargin"
+                android:layout_marginEnd="@dimen/commonMargin"
+                android:layout_marginBottom="@dimen/commonMargin"
+                android:padding="@dimen/commonPadding"
+                android:background="?android:attr/selectableItemBackground">
+                <androidx.appcompat.widget.AppCompatSpinner
+                    android:id="@+id/pronounceSpinner"
+                    android:textAlignment="center"
+                    android:layout_gravity="center"
+                    android:theme="@style/CardView.Light"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/bioLayout"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/commonMargin"
+                android:layout_marginEnd="@dimen/commonMargin"
+                android:layout_marginBottom="@dimen/commonMargin"
+                android:padding="@dimen/commonPadding"
+                android:background="?android:attr/selectableItemBackground">
+                <EditText
+                    android:id="@+id/userBio"
+                    android:padding="@dimen/commonPadding"
+                    android:hint="@string/BioHint"
+                    android:textColorHint="@drawable/edittext_selector"
+                    android:textAlignment="center"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/lite_border"/>
             </LinearLayout>
         </LinearLayout>
     </RelativeLayout>
-</ScrollView>
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/saveChanges"
+        android:text="@string/ok"
+        android:visibility="gone"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="@dimen/commonMargin"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:layout_width="200dp"
+        android:layout_height="80dp"/>
+</RelativeLayout>

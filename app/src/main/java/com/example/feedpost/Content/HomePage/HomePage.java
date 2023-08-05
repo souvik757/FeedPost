@@ -3,6 +3,7 @@ package com.example.feedpost.Content.HomePage;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -13,9 +14,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.feedpost.Content.HomePage.Profile.ProfileFragment;
+import com.example.feedpost.ImageActivity.ImageUploader.ImageUploadForPost;
 import com.example.feedpost.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.firebase.auth.FirebaseAuth;
 
 public class HomePage extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
     // widgets
@@ -41,7 +42,7 @@ public class HomePage extends AppCompatActivity implements BottomNavigationView.
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int itemID = item.getItemId() ;
         if(itemID == R.id.feedPost) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.frameFragment, new feedPostFragment()).commit();
+            startActivity(new Intent(this , ImageUploadForPost.class));
             return true;
         }else if(itemID == R.id.home) {
             getSupportFragmentManager().beginTransaction().replace(R.id.frameFragment, new HomeFragment()).commit();

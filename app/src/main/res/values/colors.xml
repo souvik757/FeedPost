@@ -15,6 +15,7 @@
     <color name="sky_light_">#E3F2FD</color>
     <color name="transparent">#00FFFFFF</color>
     <color name="ash">#FF282C34</color>
+    <color name="ashBlack">#383B39</color>
     <color name="grey">#212B40</color>
     <color name="darkBlue">#000921</color>
 </resources>

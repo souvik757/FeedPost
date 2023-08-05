@@ -19,6 +19,12 @@
         android:theme="@style/Theme.FeedPost"
         tools:targetApi="31">
         <activity
+            android:name=".ImageActivity.ImageUploader.ImageUploadForPost"
+            android:exported="false" />
+        <activity
+            android:name=".Account.EditProfile.personalizeProfile"
+            android:exported="false" />
+        <activity
             android:name=".Account.EditProfile.EditProfileActivity"
             android:exported="false" />
         <activity
