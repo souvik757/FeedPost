@@ -208,7 +208,7 @@
                 android:layout_marginEnd="@dimen/commonMargin"
                 android:layout_marginBottom="@dimen/commonMargin"
                 android:padding="@dimen/commonPadding"
-                android:background="?android:attr/selectableItemBackground">
+                android:background="@drawable/lite_border">
                 <androidx.appcompat.widget.AppCompatSpinner
                     android:id="@+id/pronounceSpinner"
                     android:textAlignment="center"

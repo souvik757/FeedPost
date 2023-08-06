@@ -11,6 +11,8 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:layout_marginBottom="80dp"
         android:background="@color/transparent">
         <RelativeLayout
             android:layout_width="match_parent"
@@ -151,11 +153,11 @@
             </LinearLayout>
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/usersPhotoGalary"
+                android:layout_below="@+id/layout2"
                 android:background="@color/transparent"
                 android:layout_marginTop="12dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/layout2"
                 android:layout_centerHorizontal="true"/>
             <ProgressBar
                 android:id="@+id/photoFetching"
@@ -167,5 +169,4 @@
                 android:layout_centerHorizontal="true"/>
         </RelativeLayout>
     </ScrollView>
-
 </FrameLayout>

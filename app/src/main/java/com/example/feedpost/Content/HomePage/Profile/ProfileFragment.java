@@ -57,6 +57,7 @@ public class ProfileFragment extends Fragment {
     private ProgressBar loadIndicate ;
     // resources
     private String currentUser ;
+    private String currentUserBio ;
     private String currentUsersGender ;
     private ArrayList<String> imageList ;
     private ImageAdapter adapter ;
@@ -175,8 +176,10 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 currentUser = documentSnapshot.getString(documentFields.UserName) ;
+                currentUserBio = documentSnapshot.getString(documentFields.ProfileBio) ;
                 currentUsersGender = documentSnapshot.getString(documentFields.Gender) ;
                 userName.setText(currentUser) ;
+                userBio.setText(currentUserBio) ;
                 if(currentUsersGender.equals("male")) {
                     userGender.setText(getResources().getString(R.string.malePronounce));
                     profilePicture.setImageResource(R.drawable.male) ;

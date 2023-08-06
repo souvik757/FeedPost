@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
     private EditText userEmail;
     private EditText passWord ;
     private Button signIn ;
+    private ProgressBar loadIndicator ;
     // firebase
     private FirebaseAuth mAuth ;
     private DatabaseReference mRealDatabase ;
@@ -50,7 +52,6 @@ public class MainActivity extends AppCompatActivity {
         initializeDatabase() ;
         // showConsent ?
         showConsent() ;
-        onCLickEvents() ;
     }
     private void showConsent(){
         // showSplash
@@ -70,68 +71,22 @@ public class MainActivity extends AppCompatActivity {
         userEmail = findViewById(R.id.usernameET) ;
         passWord = findViewById(R.id.passwordET) ;
         signIn = findViewById(R.id.buttonSignIn) ;
+        loadIndicator = findViewById(R.id.waitingBar) ;
     }
     // 2 .
     private void initializeDatabase(){
         mAuth = FirebaseAuth.getInstance() ;
         mRealDatabase = FirebaseDatabase.getInstance().getReference() ;
     }
-    // 3 .
-    private void onCLickEvents(){
-        signIn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(TextUtils.isEmpty(userEmail.getText())) {
-                    // show custom toast message
-                    showCustomToast("invalid email");
-                    return ;
-                }
-                if(TextUtils.isEmpty(passWord.getText())) {
-                    // show custom toast message
-                    showCustomToast("invalid password");
-                    return ;
-                }
-                String useremail = userEmail.getText().toString().trim() ;
-                String password = passWord.getText().toString().trim() ;
-                // check if we can sign in with current useremail & password
-                mAuth.signInWithEmailAndPassword(useremail , password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if(task.isSuccessful()){
-                            assert mAuth.getCurrentUser() != null ;
-                            String email = extract.getDocument(mAuth.getCurrentUser().getEmail()) ;
-                            String UID = mAuth.getCurrentUser().getUid() ;
-                            mReference = FirebaseFirestore.getInstance().collection(email).document(UID);
-                            mReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                                @Override
-                                public void onSuccess(DocumentSnapshot documentSnapshot) {
-                                    if (documentSnapshot.exists()){
-                                        String userFullName = documentSnapshot.getString(documentFields.UserName) ;
-                                        String userGender = documentSnapshot.getString(documentFields.Gender) ;
-                                        setEntryInToRealtime(useremail , userFullName , userGender) ;
-                                    }
-                                }
-                            }) ;
-                            navigateToHomepage() ;
-                        }
-                        else {
-                            // show custom toast message
-                            showCustomToast("sign in failed");
-                            // then sign up the user
-                            startActivity(new Intent(MainActivity.this , createAccount.class));
-                        }
-                    }
-                }) ;
-            }
-        });
-    }
-    // 4 .
+    //  .
     private void setEntryInToRealtime(String usermail, String fullName , String gender){
         String childPath = mAuth.getCurrentUser().getUid() ;
         // create in realtime
-        mRealDatabase.child("users").child(childPath).child("email").setValue(usermail) ;
-        mRealDatabase.child("users").child(childPath).child("name").setValue(fullName) ;
-        mRealDatabase.child("users").child(childPath).child("gender").setValue(gender) ;
+        mRealDatabase.child("users").child(childPath).child(documentFields.realtimeFields.email).setValue(usermail) ;
+        mRealDatabase.child("users").child(childPath).child(documentFields.realtimeFields.fullName).setValue(fullName) ;
+        mRealDatabase.child("users").child(childPath).child(documentFields.realtimeFields.gender).setValue(gender) ;
+        mRealDatabase.child("users").child(childPath).child(documentFields.realtimeFields.hasProfilePic).setValue(false) ;
+        mRealDatabase.child("users").child(childPath).child(documentFields.realtimeFields.hasProfileBg).setValue(false) ;
     }
     private void navigateToHomepage(){
         String documentPath = extract.getDocument(String.valueOf(userEmail)) ;
@@ -141,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
         i.putExtra("docPath" , documentPath) ;
         i.putExtra("childPath" , currentUserID) ;
         startActivity(i);
+        finish() ;
     }
     private void showCustomToast(String message){
         LayoutInflater inflater = getLayoutInflater() ;
@@ -153,5 +109,51 @@ public class MainActivity extends AppCompatActivity {
         toast.setDuration(Toast.LENGTH_LONG) ;
         toast.setView(layout);
         toast.show() ;
+    }
+
+    public void SignIn(View view) {
+        loadIndicator.setVisibility(View.VISIBLE) ;
+        if(TextUtils.isEmpty(userEmail.getText())) {
+            // show custom toast message
+            showCustomToast("invalid email");
+            return ;
+        }
+        if(TextUtils.isEmpty(passWord.getText())) {
+            // show custom toast message
+            showCustomToast("invalid password");
+            return ;
+        }
+        String useremail = userEmail.getText().toString().trim() ;
+        String password = passWord.getText().toString().trim() ;
+        // check if we can sign in with current useremail & password
+        mAuth.signInWithEmailAndPassword(useremail , password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if(task.isSuccessful()){
+                    assert mAuth.getCurrentUser() != null ;
+                    String email = extract.getDocument(mAuth.getCurrentUser().getEmail()) ;
+                    String UID = mAuth.getCurrentUser().getUid() ;
+                    mReference = FirebaseFirestore.getInstance().collection(email).document(UID);
+                    mReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                        @Override
+                        public void onSuccess(DocumentSnapshot documentSnapshot) {
+                            if (documentSnapshot.exists()){
+                                String userFullName = documentSnapshot.getString(documentFields.UserName) ;
+                                String userGender = documentSnapshot.getString(documentFields.Gender) ;
+                                setEntryInToRealtime(useremail , userFullName , userGender) ;
+                                loadIndicator.setVisibility(View.GONE) ;
+                            }
+                        }
+                    }) ;
+                    navigateToHomepage() ;
+                }
+                else {
+                    // show custom toast message
+                    showCustomToast("sign in failed");
+                    // then sign up the user
+                    startActivity(new Intent(MainActivity.this , createAccount.class));
+                }
+            }
+        }) ;
     }
 }

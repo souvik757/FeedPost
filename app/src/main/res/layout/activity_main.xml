@@ -25,7 +25,7 @@
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            <EditText
+            <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/usernameET"
                 android:layout_width="match_parent"
                 android:layout_height="70dp"
@@ -41,7 +41,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:passwordToggleEnabled="true">
-            <EditText
+            <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/passwordET"
                 android:inputType="textPassword"
                 android:layout_width="match_parent"
@@ -53,7 +53,15 @@
                 android:hint="@string/password"
                 android:textColorHint="@color/sky_light_"/>
         </com.google.android.material.textfield.TextInputLayout>
+        <ProgressBar
+            android:id="@+id/waitingBar"
+            android:visibility="gone"
+            android:layout_gravity="center"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_margin="@dimen/commonMargin"/>
         <com.google.android.material.button.MaterialButton
+            android:onClick="SignIn"
             android:id="@+id/buttonSignIn"
             android:layout_width="150dp"
             android:layout_height="90dp"

@@ -37,9 +37,6 @@
             android:name=".Content.UsersList.chooseUserActivity"
             android:exported="false" />
         <activity
-            android:name=".Content.createFeeds"
-            android:exported="false" />
-        <activity
             android:name=".Content.HomePage.HomePage"
             android:exported="false"
             android:screenOrientation="portrait" />

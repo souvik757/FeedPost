@@ -12,6 +12,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,6 +40,7 @@ public class createAccount extends AppCompatActivity {
     private EditText userPassword ;
     private Spinner spinner ;
     private Button signUp ;
+    private ProgressBar loadIndicator ;
     // firebase
     private FirebaseAuth mAuth ;
     private FirebaseFirestore mDatabase ;
@@ -61,6 +63,7 @@ public class createAccount extends AppCompatActivity {
         userPassword = findViewById(R.id.passwordETSignUp) ;
         spinner = findViewById(R.id.spinner) ;
         signUp = findViewById(R.id.buttonSignUp) ;
+        loadIndicator = findViewById(R.id.showLoading) ;
     }
     // 2 .
     private void initializeDatabase(){
@@ -81,9 +84,11 @@ public class createAccount extends AppCompatActivity {
     }
     // 4 .
     private void onClickEvents(){
+
         signUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                loadIndicator.setVisibility(View.VISIBLE) ;
                 if(TextUtils.isEmpty(userEmail.getText())) {
                     // show custom toast
                     showCustomToast("Invalid email");
@@ -125,11 +130,16 @@ public class createAccount extends AppCompatActivity {
                             Map<String, Object> dataFields = new HashMap<>() ;
                             dataFields.put(documentFields.UserName , fullName) ;
                             dataFields.put(documentFields.Gender , gender) ;
+                            dataFields.put(documentFields.ProfileBio , "") ;
+                            dataFields.put(documentFields.ProfilePic , "") ;
+                            dataFields.put(documentFields.ProfileBG , "") ;
                             mDatabase.collection(collectionPath).document(childPath).set(dataFields).addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void unused) {
+                                    loadIndicator.setVisibility(View.GONE) ;
                                     // show custom toast
                                     showCustomToast("Now , you can log in");
+                                    finish() ;
                                 }
                             }) ;
                         }

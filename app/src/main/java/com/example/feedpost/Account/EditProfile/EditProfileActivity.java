@@ -49,7 +49,9 @@ public class EditProfileActivity extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                startActivity(new Intent(EditProfileActivity.this , MainActivity.class));
+                Intent intent = new Intent(EditProfileActivity.this , MainActivity.class) ;
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK) ;
+                startActivity(intent);
                 finish() ;
             }
         } , 200) ;
@@ -89,10 +91,12 @@ public class EditProfileActivity extends AppCompatActivity {
         builder.setPositiveButton("OK", (dialog, which) -> {
             // send data from the AlertDialog to the Activity
             EditText editText = customLayout.findViewById(R.id.confirmation);
-            String input = String.valueOf(editText.getText()) ;
+            String input = String.valueOf(editText.getText()).trim() ;
             if(input.equals("confirm") || input.equals("CONFIRM")) {
                 mAuth.signOut();
-                startActivity(new Intent(EditProfileActivity.this , MainActivity.class));
+                Intent i = new Intent(EditProfileActivity.this , MainActivity.class) ;
+                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK) ;
+                startActivity(i);
                 finish() ;
             }
         });

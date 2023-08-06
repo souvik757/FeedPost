@@ -90,6 +90,7 @@ public class ImageUploadForPost extends AppCompatActivity {
         startActivityForResult(Intent.createChooser(intent,"Select Image from here..."),PICK_IMAGE_REQUEST);
     }
     public void postPhoto(View view) {
+        progressBar.setVisibility(View.VISIBLE);
         String UID = mAuth.getCurrentUser().getUid() ;
         String email = mAuth.getCurrentUser().getEmail() ;
         String extractID = extract.getDocument(email) ;

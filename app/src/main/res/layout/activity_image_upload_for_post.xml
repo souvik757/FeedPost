@@ -67,8 +67,9 @@
             android:layout_width="400dp"
             android:layout_height="400dp"
             android:layout_centerHorizontal="true"
-            android:scaleType="centerCrop"
-            android:background="@drawable/picture"/>
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="true"
+            android:src="@drawable/picture"/>
         <ProgressBar
             android:id="@+id/showProgress"
             android:visibility="gone"
