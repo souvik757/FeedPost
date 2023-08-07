@@ -13,6 +13,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import com.example.feedpost.ImageActivity.ImageUploader.ImageUploadForPost;
+import com.example.feedpost.ImageActivity.ImageUploader.ImageUploadForProfilePic;
 import com.example.feedpost.R;
 import com.example.feedpost.Utility.documentFields;
 import com.example.feedpost.Utility.extract;
@@ -121,9 +122,8 @@ public class personalizeProfile extends AppCompatActivity {
         saveBTN.setVisibility(View.VISIBLE);
     }
 
-
-
     public void editProfilePic(View view) {
+        startActivity(new Intent(personalizeProfile.this , ImageUploadForProfilePic.class));
     }
 
     public void editProfileBackground(View view) {

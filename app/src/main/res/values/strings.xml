@@ -30,6 +30,7 @@
 
     <string name="account">edit account</string>
     <string name="createPost">Create post</string>
+    <string name="save">save changes</string>
     <string name="editProfilePic">edit profile picture</string>
     <string name="editProfileBG">edit profile background</string>
     <string name="editBio">edit profile Bio</string>

@@ -1,10 +1,13 @@
 package com.example.feedpost.Content.HomePage.Profile;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,22 +21,34 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.feedpost.Account.EditProfile.EditProfileActivity;
 import com.example.feedpost.OthersProfile.ImageAdapter;
 import com.example.feedpost.R;
 import com.example.feedpost.Utility.documentFields;
 import com.example.feedpost.Utility.extract;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.ListResult;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Picasso;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 
 /**
@@ -180,44 +195,36 @@ public class ProfileFragment extends Fragment {
                 currentUsersGender = documentSnapshot.getString(documentFields.Gender) ;
                 userName.setText(currentUser) ;
                 userBio.setText(currentUserBio) ;
-                if(currentUsersGender.equals("male")) {
-                    userGender.setText(getResources().getString(R.string.malePronounce));
-                    profilePicture.setImageResource(R.drawable.male) ;
-                }
-                else if(currentUsersGender.equals("female")) {
-                    userGender.setText(getResources().getString(R.string.femalePronounce));
-                    profilePicture.setImageResource(R.drawable.female) ;
+                String profilePicFile = documentSnapshot.getString(documentFields.ProfilePic) ;
+                if(profilePicFile.equals("")){
+                    if(currentUsersGender.equals("male")) {
+                        userGender.setText(getResources().getString(R.string.malePronounce));
+                        profilePicture.setImageResource(R.drawable.male) ;
+                    }
+                    else if(currentUsersGender.equals("female")) {
+                        userGender.setText(getResources().getString(R.string.femalePronounce));
+                        profilePicture.setImageResource(R.drawable.female) ;
+                    }
+                    else {
+                        userGender.setText(" ");
+                        profilePicture.setImageResource(R.drawable.skip) ;
+                    }
                 }
                 else {
-                    userGender.setText(" ");
-                    profilePicture.setImageResource(R.drawable.skip) ;
+                    if(currentUsersGender.equals("male")) {
+                        userGender.setText(getResources().getString(R.string.malePronounce));
+                    }
+                    else if(currentUsersGender.equals("female")) {
+                        userGender.setText(getResources().getString(R.string.femalePronounce));
+                    }
+                    else {
+                        userGender.setText(" ");
+                    }
+                    StorageReference ref  = FirebaseStorage.getInstance().getReference().child("userUploads").child(currentUser).child("ProfilePicture").child(profilePicFile) ;
+                    SetProfilePicture(ref,profilePicture) ;
+
                 }
-                storageReference.child(currentUser).listAll().addOnSuccessListener(new OnSuccessListener<ListResult>() {
-                    @Override
-                    public void onSuccess(ListResult listResult) {
-                        for (StorageReference file : listResult.getItems()) {
-                            file.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                                @Override
-                                public void onSuccess(Uri uri) {
-                                    //
-                                    loadIndicate.setVisibility(View.GONE);
-                                    imageList.add(uri.toString());
-                                }
-                            }).addOnSuccessListener(new OnSuccessListener<Uri>() {
-                                @Override
-                                public void onSuccess(Uri uri) {
-                                    //
-                                    photoGalary.setAdapter(adapter);
-                                }
-                            });
-                        }
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        showCustomToast("failed to fetch photos or there are none" , view);
-                    }
-                });
+                setImageGridViews(view);
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -225,6 +232,50 @@ public class ProfileFragment extends Fragment {
                 showCustomToast("something went wrong" , view);
             }
         }) ;
+    }
+    private void setImageGridViews(View view){
+        storageReference.child(currentUser).listAll().addOnSuccessListener(new OnSuccessListener<ListResult>() {
+            @Override
+            public void onSuccess(ListResult listResult) {
+                for (StorageReference file : listResult.getItems()) {
+                    file.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            //
+                            loadIndicate.setVisibility(View.GONE);
+                            imageList.add(uri.toString());
+                        }
+                    }).addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            //
+                            photoGalary.setAdapter(adapter);
+                        }
+                    });
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                showCustomToast("failed to fetch photos or there are none" , view);
+            }
+        });
+
+    }
+    private void SetProfilePicture(StorageReference reference , ImageView imageView){
+        // Fetch the download URL for the image
+        reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                // Use the download URL to load the image into the ImageView
+                Glide.with(parentHolder).load(uri).into(imageView) ;
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                // Handle any errors that occur while fetching the image
+            }
+        });
     }
     //  .
     private void showCustomToast(String message , View v){
