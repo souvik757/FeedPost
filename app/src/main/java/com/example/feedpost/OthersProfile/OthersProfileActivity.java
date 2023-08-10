@@ -16,8 +16,10 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.feedpost.Content.UsersList.UserListModel;
 import com.example.feedpost.R;
+import com.example.feedpost.Utility.documentFields;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.textview.MaterialTextView;
@@ -38,7 +40,10 @@ public class OthersProfileActivity extends AppCompatActivity {
     private ProgressBar profileFetching ;
     private TextView profileName ;
     private TextView userGender ;
+    private TextView userBio ;
+    private TextView posts ;
     private ImageView profilePic ;
+    private ImageView profileBanner ;
     // resources
     private String tempUser ;
     private String tempUserGender ;
@@ -60,12 +65,16 @@ public class OthersProfileActivity extends AppCompatActivity {
     }
     // 1 .
     private void initializeWidgetsAndVariables(){
+
         tempUser = getIntent().getStringExtra("TappedUsersName") ;
         gridView = findViewById(R.id.usersUploadGrid) ;
         profileFetching = findViewById(R.id.profileFetching) ;
         profileName = findViewById(R.id.usersProfileName) ;
         userGender = findViewById(R.id.usersProfileGender) ;
+        userBio = findViewById(R.id.usersProfileBio) ;
         profilePic = findViewById(R.id.usersProfilePic) ;
+        profileBanner = findViewById(R.id.backgroundBanner) ;
+        posts = findViewById(R.id.usersProfilePostNumber) ;
 
         imageList = new ArrayList<>() ;
         adapter = new ImageAdapter(imageList , this) ;
@@ -98,6 +107,7 @@ public class OthersProfileActivity extends AppCompatActivity {
                         public void onSuccess(Uri uri) {
                             //
                             gridView.setAdapter(adapter);
+                            posts.setText(String.valueOf(gridView.getAdapter().getItemCount())) ;
                         }
                     });
                 }
@@ -116,23 +126,41 @@ public class OthersProfileActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()){
-                    String name = dataSnapshot.child("name").getValue(String.class) ;
-                    String gender = dataSnapshot.child("gender").getValue(String.class) ;
+                    String name = dataSnapshot.child(documentFields.realtimeFields.fullName).getValue(String.class) ;
+
                     if(name.equals(tempUser)){
-                        if(gender.equals("male")) {
-                            tempUserGender = "(he/him)";
-                            profilePic.setImageResource(R.drawable.male) ;
+                        String gender = dataSnapshot.child(documentFields.realtimeFields.gender).getValue(String.class) ;
+                        String bio = dataSnapshot.child(documentFields.realtimeFields.bio).getValue(String.class) ;
+                        boolean profilePicHas = dataSnapshot.child(documentFields.realtimeFields.hasProfilePic).getValue(Boolean.class) ;
+                        boolean profileBgHas = dataSnapshot.child(documentFields.realtimeFields.hasProfileBg).getValue(Boolean.class) ;
+                        if(gender.equals("male"))
+                            tempUserGender = getString(R.string.malePronounce) ;
+                        else if(gender.equals("female"))
+                            tempUserGender = getString(R.string.femalePronounce);
+                        else
+                            tempUserGender = "" ;
+                        if(profilePicHas) {
+                            String bgFile = dataSnapshot.child("profile").child("profilePicFile").getValue(String.class) ;
+                            StorageReference ref1  = FirebaseStorage.getInstance().
+                                    getReference().child("userUploads").
+                                    child(name).
+                                    child("ProfilePicture").
+                                    child(bgFile) ;
+                            SetPicture(ref1 , profilePic);
                         }
-                        else if(gender.equals("female")) {
-                            tempUserGender = "(she/her)";
-                            profilePic.setImageResource(R.drawable.female) ;
+                        if(profileBgHas){
+                            String bgFile = dataSnapshot.child("profile").child("profileBgFile").getValue(String.class) ;
+                            StorageReference ref1  = FirebaseStorage.getInstance().
+                                    getReference().child("userUploads").
+                                    child(name).
+                                    child("ProfileBanner").
+                                    child(bgFile) ;
+                            SetPicture(ref1 , profileBanner);
                         }
-                        else {
-                            tempUserGender = " ";
-                            profilePic.setImageResource(R.drawable.skip) ;
-                        }
+                        if(!bio.equals(""))
+                            userBio.setText(bio);
+                        userGender.setText(tempUserGender);
                     }
-                    userGender.setText(tempUserGender);
                 }
             }
             @Override
@@ -140,6 +168,22 @@ public class OthersProfileActivity extends AppCompatActivity {
 
             }
         }) ;
+    }
+    //  .
+    private void SetPicture(StorageReference reference , ImageView imageView){
+        // Fetch the download URL for the image
+        reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                // Use the download URL to load the image into the ImageView
+                Glide.with(OthersProfileActivity.this).load(uri).into(imageView) ;
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                // Handle any errors that occur while fetching the image
+            }
+        });
     }
     //  .
     private void showCustomToast(String message){

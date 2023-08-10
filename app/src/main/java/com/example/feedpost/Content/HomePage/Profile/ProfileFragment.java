@@ -1,13 +1,10 @@
 package com.example.feedpost.Content.HomePage.Profile;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -27,28 +24,18 @@ import com.example.feedpost.OthersProfile.ImageAdapter;
 import com.example.feedpost.R;
 import com.example.feedpost.Utility.documentFields;
 import com.example.feedpost.Utility.extract;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.ListResult;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
-import com.squareup.picasso.Picasso;
 
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 
 /**
@@ -59,8 +46,9 @@ import java.util.ArrayList;
 public class ProfileFragment extends Fragment {
     View parentHolder ;
     // widgets
-    private Button edit ;
+    private FloatingActionButton edit ;
     private ImageView profilePicture ;
+    private ImageView profileBanner ;
     private ImageView profileVerified ;
     private TextView userName ;
     private TextView userGender ;
@@ -142,6 +130,7 @@ public class ProfileFragment extends Fragment {
         edit = v.findViewById(R.id.editButton) ;
         // imageview
         profilePicture = v.findViewById(R.id.profileDP) ;
+        profileBanner = v.findViewById(R.id.profileBanner) ;
         profileVerified = v.findViewById(R.id.verified) ;
         // textview
         userName = v.findViewById(R.id.userName) ;
@@ -196,6 +185,7 @@ public class ProfileFragment extends Fragment {
                 userName.setText(currentUser) ;
                 userBio.setText(currentUserBio) ;
                 String profilePicFile = documentSnapshot.getString(documentFields.ProfilePic) ;
+                String profileBgFile = documentSnapshot.getString(documentFields.ProfileBG) ;
                 if(profilePicFile.equals("")){
                     if(currentUsersGender.equals("male")) {
                         userGender.setText(getResources().getString(R.string.malePronounce));
@@ -220,11 +210,23 @@ public class ProfileFragment extends Fragment {
                     else {
                         userGender.setText(" ");
                     }
-                    StorageReference ref  = FirebaseStorage.getInstance().getReference().child("userUploads").child(currentUser).child("ProfilePicture").child(profilePicFile) ;
-                    SetProfilePicture(ref,profilePicture) ;
-
+                    StorageReference ref  = FirebaseStorage.getInstance().
+                            getReference().child("userUploads").
+                            child(currentUser).
+                            child("ProfilePicture").
+                            child(profilePicFile) ;
+                    SetPicture(ref,profilePicture) ;
+                }
+                if(!profileBgFile.equals("")){
+                    StorageReference ref  = FirebaseStorage.getInstance().
+                            getReference().child("userUploads").
+                            child(currentUser).
+                            child("ProfileBanner").
+                            child(profileBgFile) ;
+                    SetPicture(ref,profileBanner) ;
                 }
                 setImageGridViews(view);
+
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -250,6 +252,7 @@ public class ProfileFragment extends Fragment {
                         public void onSuccess(Uri uri) {
                             //
                             photoGalary.setAdapter(adapter);
+                            userPost.setText(String.valueOf(photoGalary.getAdapter().getItemCount()));
                         }
                     });
                 }
@@ -262,7 +265,7 @@ public class ProfileFragment extends Fragment {
         });
 
     }
-    private void SetProfilePicture(StorageReference reference , ImageView imageView){
+    private void SetPicture(StorageReference reference , ImageView imageView){
         // Fetch the download URL for the image
         reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
@@ -277,6 +280,12 @@ public class ProfileFragment extends Fragment {
             }
         });
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
     //  .
     private void showCustomToast(String message , View v){
         LayoutInflater inflater = getLayoutInflater() ;

@@ -12,6 +12,7 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
+import com.example.feedpost.ImageActivity.ImageUploader.ImageUploadBackGround;
 import com.example.feedpost.ImageActivity.ImageUploader.ImageUploadForPost;
 import com.example.feedpost.ImageActivity.ImageUploader.ImageUploadForProfilePic;
 import com.example.feedpost.R;
@@ -21,6 +22,8 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
@@ -39,6 +42,7 @@ public class personalizeProfile extends AppCompatActivity {
     // Firebase
     private FirebaseAuth mAuth ;
     private DocumentReference mReference ;
+    private DatabaseReference mRealTimeDatabase ;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,6 +64,7 @@ public class personalizeProfile extends AppCompatActivity {
     // 2 .
     private void initializeDatabase(){
         mAuth = FirebaseAuth.getInstance() ;
+        mRealTimeDatabase = FirebaseDatabase.getInstance().getReference() ;
     }
 
     private void setSpinnerItems(){
@@ -87,8 +92,24 @@ public class personalizeProfile extends AppCompatActivity {
                 mReference = FirebaseFirestore.getInstance().collection(collectionPath).document(documentPath);
 
                 Map<String,Object> data = new HashMap<>() ;
-                data.put(documentFields.Gender , ProfileGender) ;
-                data.put(documentFields.ProfileBio , ProfileBio) ;
+                if(!ProfileGender.equals("") && !ProfileBio.equals("")) {
+                    data.put(documentFields.Gender, ProfileGender);
+                    data.put(documentFields.ProfileBio, ProfileBio);
+                    mRealTimeDatabase.child("users").child(mAuth.getCurrentUser().getUid()).
+                            child(documentFields.realtimeFields.bio).setValue(ProfileBio) ;
+                    mRealTimeDatabase.child("users").child(mAuth.getCurrentUser().getUid()).
+                            child(documentFields.realtimeFields.gender).setValue(ProfileGender) ;
+                }
+                else if(!ProfileGender.equals("") && ProfileBio.equals("")) {
+                    data.put(documentFields.Gender, ProfileGender);
+                    mRealTimeDatabase.child("users").child(mAuth.getCurrentUser().getUid()).
+                            child(documentFields.realtimeFields.gender).setValue(ProfileGender) ;
+                }
+                else if(ProfileGender.equals("") && !ProfileBio.equals("")) {
+                    data.put(documentFields.ProfileBio, ProfileBio);
+                    mRealTimeDatabase.child("users").child(mAuth.getCurrentUser().getUid()).
+                            child(documentFields.realtimeFields.bio).setValue(ProfileBio) ;
+                }
 
                 mReference.update(data)
                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -127,6 +148,6 @@ public class personalizeProfile extends AppCompatActivity {
     }
 
     public void editProfileBackground(View view) {
-
+        startActivity(new Intent(personalizeProfile.this , ImageUploadBackGround.class));
     }
 }

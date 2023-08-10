@@ -10,6 +10,7 @@ public class documentFields {
         public static final String email  = "email" ;
         public static final String fullName   = "fullName" ;
         public static final String gender = "gender" ;
+        public static final String bio = "bio" ;
         public static final String hasProfilePic = "hasProfilePic"  ;
         public static final String hasProfileBg = "hasProfileBg"  ;
     }

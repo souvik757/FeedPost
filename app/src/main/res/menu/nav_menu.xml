@@ -2,17 +2,17 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/feedPost"
-        android:title="@string/feedPost"
+        android:title=""
         android:icon="@drawable/post"
         />
     <item
         android:id="@+id/home"
-        android:title="@string/home"
+        android:title=""
         android:icon="@drawable/home"
         />
     <item
         android:id="@+id/profile"
-        android:title="@string/profile"
+        android:title=""
         android:icon="@drawable/profile"
         />
 </menu>

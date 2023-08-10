@@ -84,10 +84,10 @@ public class chooseUserActivity extends AppCompatActivity {
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                             for (DataSnapshot dataSnapshot : snapshot.getChildren()){
                                 UserListModel userListModel = new UserListModel();
-                                String name = dataSnapshot.child("name").getValue(String.class) ;
+                                String name = dataSnapshot.child(documentFields.realtimeFields.fullName).getValue(String.class) ;
                                 if (!currentUserName.equals(name)) {
                                     userListModel.setProfileName(name);
-                                    String gender = dataSnapshot.child("gender").getValue(String.class) ;
+                                    String gender = dataSnapshot.child(documentFields.realtimeFields.gender).getValue(String.class) ;
                                     if(gender.equals("male"))
                                         userListModel.setProfilePic(R.drawable.male);
                                     if(gender.equals("female"))

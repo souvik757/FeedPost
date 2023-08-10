@@ -4,12 +4,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/ash"
     tools:context=".Account.MainActivity">
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/transparent"
         android:layout_gravity="center"
         android:orientation="vertical">
         <ImageView
@@ -33,9 +31,7 @@
                 android:layout_margin="16dp"
                 android:hint="@string/useremail"
                 android:inputType="textEmailAddress"
-                android:padding="12dp"
-                android:textColor="@color/white"
-                android:textColorHint="@color/sky_light_" />
+                android:padding="12dp"/>
         </com.google.android.material.textfield.TextInputLayout>
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
@@ -49,9 +45,7 @@
                 android:padding="12dp"
                 android:layout_margin="16dp"
                 android:layout_gravity="center"
-                android:textColor="@color/white"
-                android:hint="@string/password"
-                android:textColorHint="@color/sky_light_"/>
+                android:hint="@string/password"/>
         </com.google.android.material.textfield.TextInputLayout>
         <ProgressBar
             android:id="@+id/waitingBar"

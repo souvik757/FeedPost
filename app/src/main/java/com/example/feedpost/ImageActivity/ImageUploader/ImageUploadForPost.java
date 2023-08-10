@@ -60,7 +60,7 @@ public class ImageUploadForPost extends AppCompatActivity {
     }
     // 1 .
     private void initializeWidgets(){
-        imgPreview = findViewById(R.id.preview) ;
+        imgPreview = findViewById(R.id.PostPreview) ;
         progressBar = findViewById(R.id.showProgress) ;
     }
     // 2 .
@@ -90,45 +90,46 @@ public class ImageUploadForPost extends AppCompatActivity {
         startActivityForResult(Intent.createChooser(intent,"Select Image from here..."),PICK_IMAGE_REQUEST);
     }
     public void postPhoto(View view) {
-        progressBar.setVisibility(View.VISIBLE);
-        String UID = mAuth.getCurrentUser().getUid() ;
-        String email = mAuth.getCurrentUser().getEmail() ;
-        String extractID = extract.getDocument(email) ;
-        mReference = mFirestore.collection(extractID).document(UID) ;
+            progressBar.setVisibility(View.VISIBLE);
+            String UID = mAuth.getCurrentUser().getUid();
+            String email = mAuth.getCurrentUser().getEmail();
+            String extractID = extract.getDocument(email);
+            mReference = mFirestore.collection(extractID).document(UID);
 
-        mReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                if(documentSnapshot.exists()){
-                    String name = documentSnapshot.getString(documentFields.UserName) ;
-                    // Get the data from an ImageView as bytes
-                    imgPreview.setDrawingCacheEnabled(true);
-                    imgPreview.buildDrawingCache();
-                    Bitmap bitmap = ((BitmapDrawable) imgPreview.getDrawable()).getBitmap();
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-                    byte[] data = baos.toByteArray();
-                    UploadTask uploadTask = mStorage.getReference().child("userUploads").child(name)
-                            .child(fileName).putBytes(data);
-                    uploadTask.addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception exception) {
-                            // Handle unsuccessful uploads
-                            progressBar.setVisibility(View.GONE);
-                            showCustomToast("Something went wrong" , view);
-                        }
-                    }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
-                            // ...
-                            progressBar.setVisibility(View.GONE);
-                            finish() ;
-                        }
-                    });
+            mReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                @Override
+                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                    if (documentSnapshot.exists()) {
+                        String name = documentSnapshot.getString(documentFields.UserName);
+                        // Get the data from an ImageView as bytes
+                        imgPreview.setDrawingCacheEnabled(true);
+                        imgPreview.buildDrawingCache();
+                        Bitmap bitmap = ((BitmapDrawable) imgPreview.getDrawable()).getBitmap();
+                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                        byte[] data = baos.toByteArray();
+                        UploadTask uploadTask = mStorage.getReference().child("userUploads").child(name)
+                                .child(fileName).putBytes(data);
+                        uploadTask.addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception exception) {
+                                // Handle unsuccessful uploads
+                                progressBar.setVisibility(View.GONE);
+                                showCustomToast("Something went wrong", view);
+                            }
+                        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                            @Override
+                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
+                                // ...
+                                progressBar.setVisibility(View.GONE);
+                                finish();
+                            }
+                        });
+                    }
                 }
-            }
-        }) ;
+            });
+
     }
     private void showCustomToast(String message , View parentHolder){
         LayoutInflater inflater = getLayoutInflater() ;

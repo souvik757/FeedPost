@@ -6,82 +6,85 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/ash"
     tools:context=".Content.HomePage.Profile.ProfileFragment">
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true"
-        android:layout_marginBottom="80dp"
-        android:background="@color/transparent">
+        android:layout_marginBottom="80dp">
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            <androidx.appcompat.widget.AppCompatButton
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/editButton"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/edit_48"
                 android:layout_marginEnd="12dp"
                 android:layout_marginTop="12dp"
-                android:layout_alignParentEnd="true"
-                android:background="@drawable/editprofile"/>
+                android:layout_alignParentEnd="true"/>
             <RelativeLayout
+                android:id="@+id/bgLayout"
                 android:layout_width="match_parent"
-                android:layout_height="180dp"
-                android:background="@color/violate_dark">
+                android:layout_height="200dp">
+                <ImageView
+                    android:id="@+id/profileBanner"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:scaleType="fitXY"/>
             </RelativeLayout>
+            <LinearLayout
+                android:layout_below="@+id/bgLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="170dp"
+                android:orientation="vertical">
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/userName"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+                    <ImageView
+                        android:id="@+id/verified"
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"/>
+                </LinearLayout>
+                <TextView
+                    android:id="@+id/userPronounce"
+                    android:textSize="12sp"
+                    android:textColor="@color/sky"
+                    android:textStyle="bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
             <LinearLayout
                 android:id="@+id/layout1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="130dp">
+                android:layout_marginTop="150dp">
                 <androidx.cardview.widget.CardView
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
+                    android:id="@+id/view2"
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
                     android:layout_marginStart="30dp"
                     android:elevation="12dp"
-                    android:id="@+id/view2"
-                    app:cardCornerRadius="40dp">
+                    app:cardCornerRadius="60dp">
                     <ImageView
                         android:id="@+id/profileDP"
-                        android:layout_height="80dp"
-                        android:layout_width="80dp"
+                        android:layout_height="120dp"
+                        android:layout_width="120dp"
                         android:scaleType="centerCrop"
                         android:adjustViewBounds="true"/>
                 </androidx.cardview.widget.CardView>
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:orientation="vertical"
-                    android:background="@color/transparent">
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
-                        <TextView
-                            android:id="@+id/userName"
-                            android:textSize="20sp"
-                            android:textColor="@color/white"
-                            android:textStyle="bold"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"/>
-                        <ImageView
-                            android:id="@+id/verified"
-                            android:layout_width="15dp"
-                            android:layout_height="15dp"/>
-                    </LinearLayout>
-                    <TextView
-                        android:id="@+id/userPronounce"
-                        android:textSize="12sp"
-                        android:textColor="@color/sky"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-                </LinearLayout>
+
             </LinearLayout>
             <TextView
                 android:id="@+id/userBio"
-                android:text="Bio"
-                android:textColor="@color/white"
+                android:textSize="16sp"
                 android:layout_below="@+id/layout1"
                 android:layout_marginTop="10dp"
                 android:layout_marginStart="30dp"
@@ -104,15 +107,15 @@
                     android:background="@color/transparent">
                     <TextView
                         android:id="@+id/postNumber"
+                        android:textStyle="bold"
+                        android:textSize="25sp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:textColor="@color/white"/>
+                        android:layout_gravity="center"/>
                     <com.google.android.material.button.MaterialButton
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/posts"
-                        android:textColor="@color/black"/>
+                        android:text="@string/posts"/>
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -123,15 +126,15 @@
                     android:background="@color/transparent">
                     <TextView
                         android:id="@+id/followerNumber"
+                        android:textStyle="bold"
+                        android:textSize="25sp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:textColor="@color/white"/>
+                        android:layout_gravity="center"/>
                     <com.google.android.material.button.MaterialButton
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/followers"
-                        android:textColor="@color/black"/>
+                        android:text="@string/followers"/>
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -140,15 +143,15 @@
                     android:background="@color/transparent">
                     <TextView
                         android:id="@+id/followingNumber"
+                        android:textStyle="bold"
+                        android:textSize="25sp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:textColor="@color/white"/>
+                        android:layout_gravity="center"/>
                     <com.google.android.material.button.MaterialButton
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/following"
-                        android:textColor="@color/black"/>
+                        android:text="@string/following"/>
                 </LinearLayout>
             </LinearLayout>
             <androidx.recyclerview.widget.RecyclerView

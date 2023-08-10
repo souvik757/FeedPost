@@ -78,15 +78,74 @@ public class MainActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance() ;
         mRealDatabase = FirebaseDatabase.getInstance().getReference() ;
     }
+    public void SignIn(View view) {
+        loadIndicator.setVisibility(View.VISIBLE) ;
+        if(TextUtils.isEmpty(userEmail.getText())) {
+            // show custom toast message
+            showCustomToast("invalid email");
+            loadIndicator.setVisibility(View.GONE) ;
+            return ;
+        }
+        if(TextUtils.isEmpty(passWord.getText())) {
+            // show custom toast message
+            showCustomToast("invalid password");
+            loadIndicator.setVisibility(View.GONE) ;
+            return ;
+        }
+        String useremail = userEmail.getText().toString().trim() ;
+        String password = passWord.getText().toString().trim() ;
+        // check if we can sign in with current useremail & password
+        mAuth.signInWithEmailAndPassword(useremail , password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if(task.isSuccessful()){
+                    assert mAuth.getCurrentUser() != null ;
+                    String email = extract.getDocument(mAuth.getCurrentUser().getEmail()) ;
+                    String UID = mAuth.getCurrentUser().getUid() ;
+                    mReference = FirebaseFirestore.getInstance().collection(email).document(UID);
+                    mReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                        @Override
+                        public void onSuccess(DocumentSnapshot documentSnapshot) {
+                            if (documentSnapshot.exists()){
+                                String userFullName = documentSnapshot.getString(documentFields.UserName) ;
+                                String userGender = documentSnapshot.getString(documentFields.Gender) ;
+                                String profilePic =  documentSnapshot.getString(documentFields.ProfilePic) ;
+                                String profileBg = documentSnapshot.getString(documentFields.ProfileBG) ;
+                                String profileBio = documentSnapshot.getString(documentFields.ProfileBio) ;
+                                setEntryInToRealtime(useremail , userFullName , userGender , profilePic ,profileBg,profileBio) ;
+                                loadIndicator.setVisibility(View.GONE) ;
+                            }
+                        }
+                    }) ;
+                    navigateToHomepage() ;
+                }
+                else {
+                    // show custom toast message
+                    showCustomToast("sign in failed");
+                    loadIndicator.setVisibility(View.GONE);
+                    // then sign up the user
+                    startActivity(new Intent(MainActivity.this , createAccount.class));
+                }
+            }
+        }) ;
+    }
+
     //  .
-    private void setEntryInToRealtime(String usermail, String fullName , String gender){
+    private void setEntryInToRealtime(String usermail, String fullName , String gender ,String profilePic , String profileBg, String profileBio){
         String childPath = mAuth.getCurrentUser().getUid() ;
         // create in realtime
         mRealDatabase.child("users").child(childPath).child(documentFields.realtimeFields.email).setValue(usermail) ;
         mRealDatabase.child("users").child(childPath).child(documentFields.realtimeFields.fullName).setValue(fullName) ;
         mRealDatabase.child("users").child(childPath).child(documentFields.realtimeFields.gender).setValue(gender) ;
-        mRealDatabase.child("users").child(childPath).child(documentFields.realtimeFields.hasProfilePic).setValue(false) ;
-        mRealDatabase.child("users").child(childPath).child(documentFields.realtimeFields.hasProfileBg).setValue(false) ;
+        if(profilePic.equals(""))
+            mRealDatabase.child("users").child(childPath).child(documentFields.realtimeFields.hasProfilePic).setValue(false) ;
+        else
+            mRealDatabase.child("users").child(childPath).child(documentFields.realtimeFields.hasProfilePic).setValue(true) ;
+        if(profileBg.equals(""))
+            mRealDatabase.child("users").child(childPath).child(documentFields.realtimeFields.hasProfileBg).setValue(false) ;
+        else
+            mRealDatabase.child("users").child(childPath).child(documentFields.realtimeFields.hasProfileBg).setValue(true) ;
+        mRealDatabase.child("users").child(childPath).child(documentFields.realtimeFields.bio).setValue(profileBio) ;
     }
     private void navigateToHomepage(){
         String documentPath = extract.getDocument(String.valueOf(userEmail)) ;
@@ -109,51 +168,5 @@ public class MainActivity extends AppCompatActivity {
         toast.setDuration(Toast.LENGTH_LONG) ;
         toast.setView(layout);
         toast.show() ;
-    }
-
-    public void SignIn(View view) {
-        loadIndicator.setVisibility(View.VISIBLE) ;
-        if(TextUtils.isEmpty(userEmail.getText())) {
-            // show custom toast message
-            showCustomToast("invalid email");
-            return ;
-        }
-        if(TextUtils.isEmpty(passWord.getText())) {
-            // show custom toast message
-            showCustomToast("invalid password");
-            return ;
-        }
-        String useremail = userEmail.getText().toString().trim() ;
-        String password = passWord.getText().toString().trim() ;
-        // check if we can sign in with current useremail & password
-        mAuth.signInWithEmailAndPassword(useremail , password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                if(task.isSuccessful()){
-                    assert mAuth.getCurrentUser() != null ;
-                    String email = extract.getDocument(mAuth.getCurrentUser().getEmail()) ;
-                    String UID = mAuth.getCurrentUser().getUid() ;
-                    mReference = FirebaseFirestore.getInstance().collection(email).document(UID);
-                    mReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                        @Override
-                        public void onSuccess(DocumentSnapshot documentSnapshot) {
-                            if (documentSnapshot.exists()){
-                                String userFullName = documentSnapshot.getString(documentFields.UserName) ;
-                                String userGender = documentSnapshot.getString(documentFields.Gender) ;
-                                setEntryInToRealtime(useremail , userFullName , userGender) ;
-                                loadIndicator.setVisibility(View.GONE) ;
-                            }
-                        }
-                    }) ;
-                    navigateToHomepage() ;
-                }
-                else {
-                    // show custom toast message
-                    showCustomToast("sign in failed");
-                    // then sign up the user
-                    startActivity(new Intent(MainActivity.this , createAccount.class));
-                }
-            }
-        }) ;
     }
 }
