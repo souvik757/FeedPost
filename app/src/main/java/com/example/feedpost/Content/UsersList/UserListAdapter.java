@@ -39,6 +39,10 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.ViewHo
             profileNameView  = itemView.findViewById(R.id.profileUserName) ;
         }
     }
+    public void filterList(ArrayList<UserListModel> filterlist) {
+        dataLists = filterlist;
+        notifyDataSetChanged();
+    }
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

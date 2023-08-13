@@ -199,7 +199,8 @@ public class OthersProfileActivity extends AppCompatActivity {
         toast.show() ;
     }
 
-    public void finish(View view) {
+    @Override
+    public void onBackPressed() {
         finish() ;
     }
 }

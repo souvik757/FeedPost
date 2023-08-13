@@ -14,7 +14,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.feedpost.Content.HomePage.Profile.ProfileFragment;
-import com.example.feedpost.ImageActivity.ImageUploader.ImageUploadForPost;
+import com.example.feedpost.Content.UsersList.chooseUserActivity;
+import com.example.feedpost.ImageActivity.ImageUploader.PostActivity.ImageUploadForPost;
 import com.example.feedpost.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -44,7 +45,12 @@ public class HomePage extends AppCompatActivity implements BottomNavigationView.
         if(itemID == R.id.feedPost) {
             startActivity(new Intent(this , ImageUploadForPost.class));
             return true;
-        }else if(itemID == R.id.home) {
+        }
+        else if(itemID == R.id.searchPeople) {
+            startActivity(new Intent(this , chooseUserActivity.class));
+            return true ;
+        }
+        else if(itemID == R.id.home) {
             getSupportFragmentManager().beginTransaction().replace(R.id.frameFragment, new HomeFragment()).commit();
             return true;
         }

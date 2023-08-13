@@ -14,4 +14,20 @@ public class documentFields {
         public static final String hasProfilePic = "hasProfilePic"  ;
         public static final String hasProfileBg = "hasProfileBg"  ;
     }
+    public static class realtimePostFields{
+        public static final String Admin = "Admin" ;
+        public static class _Admin_ {
+            public static final String ID = "ID" ;
+            public static final String NAME = "NAME" ;
+            public static final String EXTRACEDEMAIL = "EXTRACEDEMAIL" ;
+            public static final String COMMENT = "COMMENT" ;
+            public static final String CONTENTFILE = "CONTENTFILE" ;
+        }
+        public static final String Likes = "Likes" ;
+        public static final class Likes {
+            public static final String COUNT = "COUNT" ;
+            public static final String PERSONS = "PERSONS" ;
+        }
+    }
 }
+

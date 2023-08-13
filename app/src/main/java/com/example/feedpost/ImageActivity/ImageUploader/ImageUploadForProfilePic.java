@@ -134,8 +134,8 @@ public class ImageUploadForProfilePic extends AppCompatActivity {
                 }
             });
     }
-
-    public void prevActivity(View view) {
+    @Override
+    public void onBackPressed() {
         finish() ;
     }
 

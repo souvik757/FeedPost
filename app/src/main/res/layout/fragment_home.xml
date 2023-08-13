@@ -3,39 +3,25 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     tools:context=".Content.HomePage.HomeFragment">
-
-    <!-- TODO: Update blank fragment layout -->
-    <androidx.appcompat.widget.LinearLayoutCompat
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="start"
-        android:orientation="vertical"
-        android:background="@color/transparent">
-        <LinearLayout
-            android:layout_margin="18dp"
-            android:layout_gravity="center"
-            android:background="@color/transparent"
-            android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fillViewport="true">
+        <RelativeLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            <ImageView
-                android:background="@drawable/feedpost"
-                android:layout_width="35dp"
-                android:layout_height="35dp"/>
-            <TextView
-                android:layout_marginStart="20dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:text="home" />
-        </LinearLayout>
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/peopleBTN"
-            android:text="see people"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="50dp"/>
-    </androidx.appcompat.widget.LinearLayoutCompat>
-
+            <ProgressBar
+                android:id="@+id/loadContents"
+                android:visibility="gone"
+                android:layout_centerInParent="true"
+                android:layout_width="30dp"
+                android:layout_height="30dp"/>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/publicPostView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+        </RelativeLayout>
+    </ScrollView>
 </FrameLayout>

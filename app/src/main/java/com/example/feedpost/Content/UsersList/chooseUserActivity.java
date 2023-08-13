@@ -2,10 +2,14 @@ package com.example.feedpost.Content.UsersList;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -57,6 +61,41 @@ public class chooseUserActivity extends AppCompatActivity {
         fillListWithData() ;
         initializeAdapter() ;
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater() ;
+        inflater.inflate(R.menu.search_user , menu) ;
+        MenuItem searchItem = menu.findItem(R.id.actionSearch) ;
+        SearchView searchView = (SearchView) searchItem.getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                filter(newText) ;
+                return false;
+            }
+        });
+
+        return true ;
+    }
+    //  .
+    private void filter(String text){
+        ArrayList<UserListModel> filteredList = new ArrayList<>() ;
+        for (UserListModel item : usersDataList){
+            if(item.getProfileName().toLowerCase().contains(text.toLowerCase()))
+                filteredList.add(item) ;
+        }
+        if (filteredList.isEmpty())
+            showCustomToast("no data found");
+        else
+            adapter.filterList(filteredList) ;
+    }
+
     // 1 .
     private void initializeWidgetsAndVariables(){
         usersList = findViewById(R.id.usersCardView) ;

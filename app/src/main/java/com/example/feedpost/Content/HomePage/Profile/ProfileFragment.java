@@ -202,10 +202,10 @@ public class ProfileFragment extends Fragment {
                 }
                 else {
                     if(currentUsersGender.equals("male")) {
-                        userGender.setText(getResources().getString(R.string.malePronounce));
+                        userGender.setText("(he/him)");
                     }
                     else if(currentUsersGender.equals("female")) {
-                        userGender.setText(getResources().getString(R.string.femalePronounce));
+                        userGender.setText("(she/her)");
                     }
                     else {
                         userGender.setText(" ");

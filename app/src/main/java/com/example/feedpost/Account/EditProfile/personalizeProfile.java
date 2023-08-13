@@ -13,7 +13,6 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import com.example.feedpost.ImageActivity.ImageUploader.ImageUploadBackGround;
-import com.example.feedpost.ImageActivity.ImageUploader.ImageUploadForPost;
 import com.example.feedpost.ImageActivity.ImageUploader.ImageUploadForProfilePic;
 import com.example.feedpost.R;
 import com.example.feedpost.Utility.documentFields;
@@ -26,8 +25,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -129,10 +126,6 @@ public class personalizeProfile extends AppCompatActivity {
             }
         }) ;
     }
-
-    public void backToPrev(View view) {
-        finish() ;
-    }
     public void editUserPronounce(View view) {
         genderLayout.setVisibility(View.VISIBLE) ;
         saveBTN.setVisibility(View.VISIBLE);
@@ -149,5 +142,9 @@ public class personalizeProfile extends AppCompatActivity {
 
     public void editProfileBackground(View view) {
         startActivity(new Intent(personalizeProfile.this , ImageUploadBackGround.class));
+    }
+    @Override
+    public void onBackPressed() {
+        finish() ;
     }
 }

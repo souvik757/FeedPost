@@ -138,7 +138,8 @@ public class ImageUploadBackGround extends AppCompatActivity {
         intent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(Intent.createChooser(intent,"Select Image from here..."),PICK_IMAGE_REQUEST);
     }
-    public void previousActivity(View view) {
+    @Override
+    public void onBackPressed() {
         finish() ;
     }
     @Override

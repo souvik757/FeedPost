@@ -36,14 +36,10 @@ public class EditProfileActivity extends AppCompatActivity {
     private void initializeDatabase(){
         mAuth = FirebaseAuth.getInstance() ;
     }
-    public void back(View view) {
-        finish() ;
-    }
 
     public void signIn(View view) {
         showAlertDialogButtonClicked(view) ;
     }
-
     public void signOut(View view) {
         mAuth.signOut() ;
         new Handler().postDelayed(new Runnable() {
@@ -56,6 +52,7 @@ public class EditProfileActivity extends AppCompatActivity {
             }
         } , 200) ;
     }
+
     //  .
     public void sendVerification(View view) {
         mAuth.getCurrentUser().sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -66,7 +63,6 @@ public class EditProfileActivity extends AppCompatActivity {
             }
         }) ;
     }
-
     public void sendPasswordReset(View view) {
         String email = String.valueOf(mAuth.getCurrentUser().getEmail()) ;
         mAuth.sendPasswordResetEmail(email).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -77,6 +73,7 @@ public class EditProfileActivity extends AppCompatActivity {
             }
         }) ;
     }
+
     public void personalizeProfile(View view) {
         startActivity(new Intent(EditProfileActivity.this, personalizeProfile.class));
     }
@@ -105,6 +102,10 @@ public class EditProfileActivity extends AppCompatActivity {
         dialog.show();
     }
 
+    @Override
+    public void onBackPressed() {
+        finish() ;
+    }
     //  .
 
     private void showCustomToast(String message , View v){

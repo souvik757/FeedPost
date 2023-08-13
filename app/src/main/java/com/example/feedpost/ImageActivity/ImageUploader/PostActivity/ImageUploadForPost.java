@@ -1,4 +1,4 @@
-package com.example.feedpost.ImageActivity.ImageUploader;
+package com.example.feedpost.ImageActivity.ImageUploader.PostActivity;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,6 +15,7 @@ import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -28,6 +29,8 @@ import com.example.feedpost.Utility.extract;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -41,13 +44,17 @@ import java.util.UUID;
 public class ImageUploadForPost extends AppCompatActivity {
     // widgets
     private ImageView imgPreview ;
+    private EditText commentText ;
     private ProgressBar progressBar ;
     // firebase & resources
     private FirebaseStorage mStorage ;
     private FirebaseAuth mAuth ;
     private FirebaseFirestore mFirestore ;
     private DocumentReference mReference ;
-    private final String fileName = UUID.randomUUID().toString()+".jpg" ;
+    private DatabaseReference mRealtime ;
+    private final String fileNameRealtime = UUID.randomUUID().toString() ;
+    private final String fileName = fileNameRealtime+".jpg" ;
+    private String postUID ;
     // request code
     private Uri filePath;
     private final int PICK_IMAGE_REQUEST = 22;
@@ -61,12 +68,14 @@ public class ImageUploadForPost extends AppCompatActivity {
     // 1 .
     private void initializeWidgets(){
         imgPreview = findViewById(R.id.PostPreview) ;
+        commentText = findViewById(R.id.postDescription) ;
         progressBar = findViewById(R.id.showProgress) ;
     }
     // 2 .
     private void initializeDatabase(){
         mAuth = FirebaseAuth.getInstance() ;
         mStorage = FirebaseStorage.getInstance() ;
+        mRealtime = FirebaseDatabase.getInstance().getReference() ;
         mFirestore = FirebaseFirestore.getInstance() ;
     }
     @Override
@@ -79,7 +88,8 @@ public class ImageUploadForPost extends AppCompatActivity {
             Glide.with(getApplicationContext()).load(filePath).into(imgPreview) ;
         }
     }
-    public void prevTab(View view) {
+    @Override
+    public void onBackPressed() {
         finish() ;
     }
     public void selectPhoto(View view) {
@@ -91,9 +101,13 @@ public class ImageUploadForPost extends AppCompatActivity {
     }
     public void postPhoto(View view) {
             progressBar.setVisibility(View.VISIBLE);
+            String comment = String.valueOf(commentText.getText()).trim() ;
+
             String UID = mAuth.getCurrentUser().getUid();
             String email = mAuth.getCurrentUser().getEmail();
             String extractID = extract.getDocument(email);
+            // postUID assigned to each post as a primary key .
+            postUID = UID+"__"+fileNameRealtime ;
             mReference = mFirestore.collection(extractID).document(UID);
 
             mReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
@@ -110,6 +124,7 @@ public class ImageUploadForPost extends AppCompatActivity {
                         byte[] data = baos.toByteArray();
                         UploadTask uploadTask = mStorage.getReference().child("userUploads").child(name)
                                 .child(fileName).putBytes(data);
+
                         uploadTask.addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception exception) {
@@ -122,6 +137,7 @@ public class ImageUploadForPost extends AppCompatActivity {
                             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                                 // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
                                 // ...
+                                setEntryToRealtime(postUID , UID , name , extractID , comment , fileNameRealtime);
                                 progressBar.setVisibility(View.GONE);
                                 finish();
                             }
@@ -130,6 +146,18 @@ public class ImageUploadForPost extends AppCompatActivity {
                 }
             });
 
+    }
+    private void setEntryToRealtime(String postUID , String id , String name , String extarctedemail , String comment , String contentfile){
+        mRealtime.child("posts").child(postUID).
+                child(documentFields.realtimePostFields.Admin).child(documentFields.realtimePostFields._Admin_.ID).setValue(id) ;
+        mRealtime.child("posts").child(postUID).
+                child(documentFields.realtimePostFields.Admin).child(documentFields.realtimePostFields._Admin_.NAME).setValue(name) ;
+        mRealtime.child("posts").child(postUID).
+                child(documentFields.realtimePostFields.Admin).child(documentFields.realtimePostFields._Admin_.EXTRACEDEMAIL).setValue(extarctedemail) ;
+        mRealtime.child("posts").child(postUID).
+                child(documentFields.realtimePostFields.Admin).child(documentFields.realtimePostFields._Admin_.COMMENT).setValue(comment) ;
+        mRealtime.child("posts").child(postUID).
+                child(documentFields.realtimePostFields.Admin).child(documentFields.realtimePostFields._Admin_.CONTENTFILE).setValue(contentfile) ;
     }
     private void showCustomToast(String message , View parentHolder){
         LayoutInflater inflater = getLayoutInflater() ;

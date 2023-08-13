@@ -25,7 +25,7 @@
             android:name=".ImageActivity.ImageUploader.ImageUploadForProfilePic"
             android:exported="false" />
         <activity
-            android:name=".ImageActivity.ImageUploader.ImageUploadForPost"
+            android:name=".ImageActivity.ImageUploader.PostActivity.ImageUploadForPost"
             android:exported="false" />
         <activity
             android:name=".Account.EditProfile.personalizeProfile"
