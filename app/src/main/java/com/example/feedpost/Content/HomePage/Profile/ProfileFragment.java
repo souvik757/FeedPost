@@ -12,14 +12,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.example.feedpost.Account.EditProfile.EditProfileActivity;
+import com.example.feedpost.Account.EditAccount.EditProfileActivity;
 import com.example.feedpost.OthersProfile.ImageAdapter;
 import com.example.feedpost.R;
 import com.example.feedpost.Utility.documentFields;
@@ -45,6 +45,7 @@ import java.util.ArrayList;
  */
 public class ProfileFragment extends Fragment {
     View parentHolder ;
+    private ScrollView scrollview ;
     // widgets
     private FloatingActionButton edit ;
     private ImageView profilePicture ;
@@ -126,6 +127,10 @@ public class ProfileFragment extends Fragment {
 
     // 1 .
     private void initializeWidgets(View v){
+        // scrollview
+        scrollview = v.findViewById(R.id.ScrollView) ;
+        scrollview.fullScroll(View.FOCUS_DOWN);
+        scrollview.setSmoothScrollingEnabled(true);
         // button
         edit = v.findViewById(R.id.editButton) ;
         // imageview
@@ -252,6 +257,7 @@ public class ProfileFragment extends Fragment {
                         public void onSuccess(Uri uri) {
                             //
                             photoGalary.setAdapter(adapter);
+                            photoGalary.setHasFixedSize(true);
                             userPost.setText(String.valueOf(photoGalary.getAdapter().getItemCount()));
                         }
                     });

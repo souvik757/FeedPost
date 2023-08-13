@@ -28,10 +28,10 @@
             android:name=".ImageActivity.ImageUploader.PostActivity.ImageUploadForPost"
             android:exported="false" />
         <activity
-            android:name=".Account.EditProfile.personalizeProfile"
+            android:name=".Account.EditAccount.personalizeProfile"
             android:exported="false" />
         <activity
-            android:name=".Account.EditProfile.EditProfileActivity"
+            android:name=".Account.EditAccount.EditProfileActivity"
             android:exported="false" />
         <activity
             android:name=".ImageActivity.ImageActivity"
@@ -47,13 +47,13 @@
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Account.createAccount"
+            android:name=".Account.SignUp.createAccount"
             android:exported="false" />
         <activity
             android:name=".spalashScreen"
             android:exported="false" />
         <activity
-            android:name=".Account.MainActivity"
+            android:name=".Account.SignIn.MainActivity"
             android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

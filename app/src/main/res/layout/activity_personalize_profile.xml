@@ -5,8 +5,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Account.EditProfile.personalizeProfile">
+    tools:context=".Account.EditAccount.personalizeProfile">
     <RelativeLayout
+        android:id="@+id/contentContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/commonMargin"
@@ -30,8 +31,8 @@
                 android:onClick="editProfilePic">
 
                 <ImageView
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
                     android:layout_gravity="center"
                     android:src="@drawable/edit" />
 
@@ -65,8 +66,8 @@
                 android:background="?android:attr/selectableItemBackground"
                 android:onClick="editProfileBackground">
                 <ImageView
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
                     android:layout_gravity="center"
                     android:src="@drawable/picture" />
                 <TextView
@@ -99,8 +100,8 @@
                 android:layout_marginEnd="@dimen/commonMargin"
                 android:padding="@dimen/commonPadding">
                 <ImageView
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
                     android:src="@drawable/bio"/>
                 <TextView
                     android:text="@string/editBio"
@@ -133,8 +134,8 @@
                 android:background="?android:attr/selectableItemBackground"
                 android:onClick="editUserPronounce">
                 <ImageView
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
                     android:layout_gravity="center"
                     android:src="@drawable/gender" />
                 <TextView
@@ -158,44 +159,49 @@
                         android:layout_alignParentEnd="true"/>
                 </RelativeLayout>
             </LinearLayout>
-            <LinearLayout
-                android:id="@+id/genderLayout"
-                android:visibility="gone"
+        </LinearLayout>
+    </RelativeLayout>
+    <RelativeLayout
+        android:layout_below="@+id/contentContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/bioLayout"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/commonMargin"
+            android:layout_marginEnd="@dimen/commonMargin"
+            android:layout_marginBottom="@dimen/commonMargin"
+            app:counterEnabled="true"
+            app:counterMaxLength="150">
+            <EditText
+                android:id="@+id/userBio"
+                android:maxLines="6"
+                android:textSize="13sp"
+                android:hint="@string/BioHint"
+                android:textAlignment="center"
                 android:layout_width="match_parent"
-                android:layout_height="70dp"
-                android:layout_marginStart="@dimen/commonMargin"
-                android:layout_marginEnd="@dimen/commonMargin"
-                android:layout_marginBottom="@dimen/commonMargin"
-                android:padding="@dimen/commonPadding"
-                android:background="@drawable/lite_border">
-                <androidx.appcompat.widget.AppCompatSpinner
-                    android:id="@+id/pronounceSpinner"
-                    android:textAlignment="center"
-                    android:layout_gravity="center"
-                    android:theme="@style/CardView.Light"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
-            </LinearLayout>
-            <LinearLayout
-                android:id="@+id/bioLayout"
-                android:visibility="gone"
+                android:layout_height="wrap_content" />
+        </com.google.android.material.textfield.TextInputLayout>
+        <LinearLayout
+            android:id="@+id/genderLayout"
+            android:visibility="gone"
+            android:layout_below="@+id/bioLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/commonMargin"
+            android:layout_marginEnd="@dimen/commonMargin"
+            android:layout_marginBottom="@dimen/commonMargin"
+            android:padding="@dimen/commonPadding"
+            android:background="@drawable/lite_border">
+            <androidx.appcompat.widget.AppCompatSpinner
+                android:id="@+id/pronounceSpinner"
+                android:textAlignment="center"
+                android:layout_gravity="center"
+                android:theme="@style/CardView.Light"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/commonMargin"
-                android:layout_marginEnd="@dimen/commonMargin"
-                android:layout_marginBottom="@dimen/commonMargin"
-                android:padding="@dimen/commonPadding"
-                android:background="?android:attr/selectableItemBackground">
-                <EditText
-                    android:id="@+id/userBio"
-                    android:padding="@dimen/commonPadding"
-                    android:hint="@string/BioHint"
-                    android:textColorHint="@drawable/edittext_selector"
-                    android:textAlignment="center"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/lite_border"/>
-            </LinearLayout>
+                android:layout_height="wrap_content"/>
         </LinearLayout>
     </RelativeLayout>
     <com.google.android.material.button.MaterialButton

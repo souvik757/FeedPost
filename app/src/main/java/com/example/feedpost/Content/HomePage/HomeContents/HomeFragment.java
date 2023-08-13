@@ -1,6 +1,5 @@
-package com.example.feedpost.Content.HomePage;
+package com.example.feedpost.Content.HomePage.HomeContents;
 
-import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -9,10 +8,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ProgressBar;
 
-import com.example.feedpost.Content.UsersList.chooseUserActivity;
 import com.example.feedpost.R;
 
 /**

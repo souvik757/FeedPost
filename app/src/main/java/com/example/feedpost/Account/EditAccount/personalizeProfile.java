@@ -1,4 +1,4 @@
-package com.example.feedpost.Account.EditProfile;
+package com.example.feedpost.Account.EditAccount;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -7,6 +7,7 @@ import androidx.appcompat.widget.AppCompatSpinner;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -20,6 +21,7 @@ import com.example.feedpost.Utility.extract;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -32,7 +34,7 @@ import java.util.Map;
 public class personalizeProfile extends AppCompatActivity {
     // widgets
     private LinearLayout genderLayout ;
-    private LinearLayout bioLayout ;
+    private TextInputLayout bioLayout ;
     private AppCompatSpinner spinner ;
     private AppCompatButton saveBTN ;
     private EditText userBio ;
@@ -89,7 +91,7 @@ public class personalizeProfile extends AppCompatActivity {
                 mReference = FirebaseFirestore.getInstance().collection(collectionPath).document(documentPath);
 
                 Map<String,Object> data = new HashMap<>() ;
-                if(!ProfileGender.equals("") && !ProfileBio.equals("")) {
+                if(!TextUtils.isEmpty(userBio.getText()) && !ProfileGender.equals("skip")) {
                     data.put(documentFields.Gender, ProfileGender);
                     data.put(documentFields.ProfileBio, ProfileBio);
                     mRealTimeDatabase.child("users").child(mAuth.getCurrentUser().getUid()).
@@ -97,12 +99,12 @@ public class personalizeProfile extends AppCompatActivity {
                     mRealTimeDatabase.child("users").child(mAuth.getCurrentUser().getUid()).
                             child(documentFields.realtimeFields.gender).setValue(ProfileGender) ;
                 }
-                else if(!ProfileGender.equals("") && ProfileBio.equals("")) {
+                if(TextUtils.isEmpty(userBio.getText()) && !ProfileGender.equals("skip")) {
                     data.put(documentFields.Gender, ProfileGender);
                     mRealTimeDatabase.child("users").child(mAuth.getCurrentUser().getUid()).
                             child(documentFields.realtimeFields.gender).setValue(ProfileGender) ;
                 }
-                else if(ProfileGender.equals("") && !ProfileBio.equals("")) {
+                if(!TextUtils.isEmpty(userBio.getText()) && ProfileGender.equals("skip")) {
                     data.put(documentFields.ProfileBio, ProfileBio);
                     mRealTimeDatabase.child("users").child(mAuth.getCurrentUser().getUid()).
                             child(documentFields.realtimeFields.bio).setValue(ProfileBio) ;

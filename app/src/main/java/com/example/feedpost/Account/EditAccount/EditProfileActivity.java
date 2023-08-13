@@ -1,4 +1,4 @@
-package com.example.feedpost.Account.EditProfile;
+package com.example.feedpost.Account.EditAccount;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -14,11 +14,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.feedpost.Account.MainActivity;
+import com.example.feedpost.Account.SignIn.MainActivity;
 import com.example.feedpost.R;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 
