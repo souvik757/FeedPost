@@ -1,17 +1,13 @@
 package com.example.feedpost.ImageActivity.ImageUploader.PostActivity;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,7 +18,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.example.feedpost.Content.UsersList.chooseUserActivity;
 import com.example.feedpost.R;
 import com.example.feedpost.Utility.documentFields;
 import com.example.feedpost.Utility.extract;
@@ -38,7 +33,6 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.UUID;
 
 public class ImageUploadForPost extends AppCompatActivity {
@@ -52,12 +46,11 @@ public class ImageUploadForPost extends AppCompatActivity {
     private FirebaseFirestore mFirestore ;
     private DocumentReference mReference ;
     private DatabaseReference mRealtime ;
-    private final String fileNameRealtime = UUID.randomUUID().toString() ;
-    private final String fileName = fileNameRealtime+".jpg" ;
-    private String postUID ;
+    private final String postUID  = UUID.randomUUID().toString() ;
+    private final String fileName = UUID.randomUUID().toString()+".jpg" ;
     // request code
-    private Uri filePath;
-    private final int PICK_IMAGE_REQUEST = 22;
+    private Uri filePath ;
+    private final int PICK_IMAGE_REQUEST = 22 ;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,12 +78,8 @@ public class ImageUploadForPost extends AppCompatActivity {
                 && data.getData() != null) {
             // Get the Uri of data
             filePath = data.getData();
-            Glide.with(getApplicationContext()).load(filePath).into(imgPreview) ;
+            Glide.with(getApplicationContext()).load(filePath).dontAnimate().into(imgPreview) ;
         }
-    }
-    @Override
-    public void onBackPressed() {
-        finish() ;
     }
     public void selectPhoto(View view) {
         // Defining Implicit Intent to mobile gallery
@@ -102,64 +91,67 @@ public class ImageUploadForPost extends AppCompatActivity {
     public void postPhoto(View view) {
             progressBar.setVisibility(View.VISIBLE);
             String comment = String.valueOf(commentText.getText()).trim() ;
-
             String UID = mAuth.getCurrentUser().getUid();
             String email = mAuth.getCurrentUser().getEmail();
             String extractID = extract.getDocument(email);
-            // postUID assigned to each post as a primary key .
-            postUID = UID+"__"+fileNameRealtime ;
             mReference = mFirestore.collection(extractID).document(UID);
 
             mReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                 @Override
                 public void onSuccess(DocumentSnapshot documentSnapshot) {
-                    if (documentSnapshot.exists()) {
-                        String name = documentSnapshot.getString(documentFields.UserName);
-                        // Get the data from an ImageView as bytes
-                        imgPreview.setDrawingCacheEnabled(true);
-                        imgPreview.buildDrawingCache();
-                        Bitmap bitmap = ((BitmapDrawable) imgPreview.getDrawable()).getBitmap();
-                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-                        byte[] data = baos.toByteArray();
-                        UploadTask uploadTask = mStorage.getReference().child("userUploads").child(name)
-                                .child(fileName).putBytes(data);
-
-                        uploadTask.addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception exception) {
-                                // Handle unsuccessful uploads
-                                progressBar.setVisibility(View.GONE);
-                                showCustomToast("Something went wrong", view);
-                            }
-                        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                            @Override
-                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
-                                // ...
-                                setEntryToRealtime(postUID , UID , name , extractID , comment , fileNameRealtime);
-                                progressBar.setVisibility(View.GONE);
-                                finish();
-                            }
-                        });
-                    }
+                    String name = documentSnapshot.getString(documentFields.UserName);
+                    uploadPreview(name, UID , extractID , comment , view) ;
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    showCustomToast("Something went wrong" , view);
                 }
             });
 
     }
-    private void setEntryToRealtime(String postUID , String id , String name , String extarctedemail , String comment , String contentfile){
-        mRealtime.child("posts").child(postUID).
-                child(documentFields.realtimePostFields.Admin).child(documentFields.realtimePostFields._Admin_.ID).setValue(id) ;
-        mRealtime.child("posts").child(postUID).
-                child(documentFields.realtimePostFields.Admin).child(documentFields.realtimePostFields._Admin_.NAME).setValue(name) ;
-        mRealtime.child("posts").child(postUID).
-                child(documentFields.realtimePostFields.Admin).child(documentFields.realtimePostFields._Admin_.EXTRACEDEMAIL).setValue(extarctedemail) ;
-        mRealtime.child("posts").child(postUID).
-                child(documentFields.realtimePostFields.Admin).child(documentFields.realtimePostFields._Admin_.COMMENT).setValue(comment) ;
-        mRealtime.child("posts").child(postUID).
-                child(documentFields.realtimePostFields.Admin).child(documentFields.realtimePostFields._Admin_.CONTENTFILE).setValue(contentfile) ;
+    private void uploadPreview(String name , String UID , String extractID , String comment , View view){
+        // Get the data from an ImageView as bytes
+        imgPreview.setDrawingCacheEnabled(true);
+        imgPreview.buildDrawingCache();
+        Bitmap bitmap = ((BitmapDrawable) imgPreview.getDrawable()).getBitmap();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] data = baos.toByteArray();
+        UploadTask uploadTask = mStorage.getReference().child("userUploads").child(name)
+                .child(fileName).putBytes(data);
+
+        uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
+                // ...
+                int length = fileName.length() ;
+                setEntryToRealtime(postUID , UID , name , extractID , comment , fileName.substring(0,length-4));
+                progressBar.setVisibility(View.GONE);
+
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle unsuccessful uploads
+                progressBar.setVisibility(View.GONE);
+                showCustomToast("Something went wrong", view);
+            }
+        }) ;
     }
-    private void showCustomToast(String message , View parentHolder){
+    private void setEntryToRealtime(String postUID , String id , String name , String extarctedemail , String comment , String contentfile){
+        mRealtime.child("posts").child(postUID).child(documentFields.realtimePostFields.Admin).child(documentFields.realtimePostFields._Admin_.ID)              .setValue(id) ;
+        mRealtime.child("posts").child(postUID).child(documentFields.realtimePostFields.Admin).child(documentFields.realtimePostFields._Admin_.NAME)            .setValue(name) ;
+        mRealtime.child("posts").child(postUID).child(documentFields.realtimePostFields.Admin).child(documentFields.realtimePostFields._Admin_.EXTRACED_EMAIL)  .setValue(extarctedemail) ;
+        mRealtime.child("posts").child(postUID).child(documentFields.realtimePostFields.Admin).child(documentFields.realtimePostFields._Admin_.COMMENT)         .setValue(comment) ;
+        mRealtime.child("posts").child(postUID).child(documentFields.realtimePostFields.Admin).child(documentFields.realtimePostFields._Admin_.CONTENTFILE)     .setValue(contentfile) ;
+    }
+    @Override
+    public void onBackPressed() {
+        finish() ;
+    }
+    private void showCustomToast(String message , View parentHolder) {
         LayoutInflater inflater = getLayoutInflater() ;
         View layout = inflater.inflate(R.layout.custom_toast_layout , (ViewGroup) parentHolder.findViewById(R.id.containerToast)) ;
         ImageView img = layout.findViewById(R.id.imageViewToast) ;

@@ -19,7 +19,7 @@ public class documentFields {
         public static class _Admin_ {
             public static final String ID = "ID" ;
             public static final String NAME = "NAME" ;
-            public static final String EXTRACEDEMAIL = "EXTRACEDEMAIL" ;
+            public static final String EXTRACED_EMAIL = "EXTRACEDEMAIL" ;
             public static final String COMMENT = "COMMENT" ;
             public static final String CONTENTFILE = "CONTENTFILE" ;
         }

@@ -2,7 +2,10 @@ package com.example.feedpost.Content.HomePage.HomeContents;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
@@ -11,6 +14,22 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
 import com.example.feedpost.R;
+import com.example.feedpost.Utility.documentFields;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+
+import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -22,6 +41,13 @@ public class HomeFragment extends Fragment {
     // widgets
     private ProgressBar loadingBar ;
     private RecyclerView recyclerView ;
+    // firebase
+    private FirebaseAuth mAuth ;
+    private DocumentReference mReference ;
+    private DatabaseReference mRealDatabase ;
+    // resources
+    private PostDataAdapter adapter ;
+    private ArrayList<PostDataModel> postArrayList ;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -68,8 +94,12 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         parentHolder =  inflater.inflate(R.layout.fragment_home, container, false);
-        initializeWidgets(parentHolder) ;
+        // customize action bar
 
+        initializeWidgets(parentHolder) ;
+        initializeRawResources(parentHolder) ;
+        initializeDatabase() ;
+        fillListWithData() ;
 
 
 
@@ -80,5 +110,68 @@ public class HomeFragment extends Fragment {
     private void initializeWidgets(View view){
         loadingBar = view.findViewById(R.id.loadContents) ;
         recyclerView = view.findViewById(R.id.publicPostView) ;
+    }
+    // 2 .
+    private void initializeRawResources(View view){
+        postArrayList = new ArrayList<>() ;
+        adapter = new PostDataAdapter(view.getContext() , postArrayList) ;
+        recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
+        recyclerView.setAdapter(adapter) ;
+        recyclerView.setHasFixedSize(true) ;
+        recyclerView.addItemDecoration(new DividerItemDecoration(view.getContext() , LinearLayoutManager.VERTICAL));
+    }
+    // 3 .
+    private void initializeDatabase(){
+        mAuth = FirebaseAuth.getInstance() ;
+        mRealDatabase = FirebaseDatabase.getInstance().getReference() ;
+    }
+    // 4 .
+    private void fillListWithData(){
+        // loading bar start . . .
+        loadingBar.setVisibility(View.VISIBLE) ;
+        mRealDatabase.child("posts").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()){
+
+                    PostDataModel dataModel = new PostDataModel() ;
+                    String Uid = dataSnapshot.child(documentFields.realtimePostFields.Admin)
+                            .child(documentFields.realtimePostFields._Admin_.ID).getValue(String.class) ;
+                    if(!mAuth.getCurrentUser().getUid().equals(Uid)){
+                        String extractedId = dataSnapshot.child(documentFields.realtimePostFields.Admin)
+                                .child(documentFields.realtimePostFields._Admin_.EXTRACED_EMAIL).getValue(String.class) ;
+                        /* text elements */
+                        // - name
+                        String name = dataSnapshot.child(documentFields.realtimePostFields.Admin)
+                                .child(documentFields.realtimePostFields._Admin_.NAME).getValue(String.class) ;
+                        // - comment
+                        String comment = dataSnapshot.child(documentFields.realtimePostFields.Admin)
+                                .child(documentFields.realtimePostFields._Admin_.COMMENT).getValue(String.class) ;
+                        // - image files
+                        String image = dataSnapshot.child(documentFields.realtimePostFields.Admin)
+                                .child(documentFields.realtimePostFields._Admin_.CONTENTFILE).getValue(String.class)+".jpg" ;
+                        StorageReference storageReference1 = FirebaseStorage.getInstance().getReference()
+                                .child("userUploads").child(name).child(image) ;
+
+
+
+                        dataModel.setID(Uid) ;
+                        dataModel.setExtractID(extractedId) ;
+                        dataModel.setAdminName(name) ;
+                        dataModel.setAdminComment(comment) ;
+                        dataModel.setRef(storageReference1) ;
+
+                        postArrayList.add(dataModel) ;
+                        loadingBar.setVisibility(View.GONE) ;
+
+                        adapter.notifyDataSetChanged() ;
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        }) ;
     }
 }

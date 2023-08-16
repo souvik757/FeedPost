@@ -12,13 +12,13 @@
         android:layout_margin="@dimen/commonPadding"
         app:cardCornerRadius="35dp">
         <ImageView
-            android:id="@+id/profileOfPost1"
+            android:id="@+id/profileOfAdmin1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:scaleType="fitCenter"/>
     </androidx.cardview.widget.CardView>
     <TextView
-        android:id="@+id/nameOfPost"
+        android:id="@+id/nameOfAdmin"
         android:textSize="20sp"
         android:textStyle="bold"
         android:layout_toEndOf="@+id/l1"
@@ -27,30 +27,26 @@
         android:layout_marginStart="@dimen/commonMargin"
         android:layout_marginTop="@dimen/commonMargin"/>
     <com.google.android.material.button.MaterialButton
-        android:layout_below="@+id/nameOfPost"
+        android:id="@+id/followAdmin"
+        android:layout_below="@+id/nameOfAdmin"
         android:layout_toEndOf="@+id/l1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/commonMargin"
         android:text="@string/follow"/>
-    <LinearLayout
-        android:id="@+id/content"
-        android:layout_marginTop="@dimen/commonPadding"
-        android:background="@drawable/lite_border"
-        android:layout_centerHorizontal="true"
+    <ImageView
+        android:id="@+id/contentOfPost"
+        android:layout_below="@+id/followAdmin"
         android:layout_centerVertical="true"
-        android:layout_below="@+id/l1"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="5dp"
+        android:adjustViewBounds="true"
+        android:fitsSystemWindows="true"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-        <ImageView
-            android:id="@+id/contentOfPost"
-            android:layout_gravity="center"
-            android:layout_width="400dp"
-            android:layout_height="400dp"/>
-    </LinearLayout>
+        android:layout_height="wrap_content"/>
     <LinearLayout
         android:id="@+id/l2"
-        android:layout_below="@+id/content"
+        android:layout_below="@+id/contentOfPost"
         android:layout_marginTop="@dimen/commonMargin"
         android:layout_marginStart="@dimen/commonPadding"
         android:layout_marginEnd="@dimen/commonPadding"
@@ -70,7 +66,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/commentForPost"
             android:layout_width="35dp"
             android:layout_height="35dp"
             android:layout_marginStart="@dimen/commonMargin"
@@ -86,7 +81,6 @@
     </LinearLayout>
     <LinearLayout
         android:id="@+id/adminCommentLayout"
-        android:visibility="gone"
         android:layout_below="@+id/l2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -99,7 +93,7 @@
             android:layout_margin="@dimen/commonPadding"
             app:cardCornerRadius="35dp">
             <ImageView
-                android:id="@+id/profileOfPost2"
+                android:id="@+id/profileOfAdmin2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:scaleType="fitCenter"/>
@@ -111,4 +105,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
     </LinearLayout>
+    <ProgressBar
+        android:id="@+id/loadImages"
+        android:visibility="gone"
+        android:layout_centerInParent="true"
+        android:layout_width="30dp"
+        android:layout_height="30dp"/>
 </RelativeLayout>
