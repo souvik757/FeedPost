@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -20,15 +21,23 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.feedpost.Account.EditAccount.EditProfileActivity;
-import com.example.feedpost.OthersProfile.ImageAdapter;
+import com.example.feedpost.CustomImageAdapter.ImageAdapter;
+import com.example.feedpost.CustomImageAdapter.ImageModelClass;
 import com.example.feedpost.R;
 import com.example.feedpost.Utility.documentFields;
 import com.example.feedpost.Utility.extract;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -63,13 +72,15 @@ public class ProfileFragment extends Fragment {
     private String currentUser ;
     private String currentUserBio ;
     private String currentUsersGender ;
-    private ArrayList<String> imageList ;
+    private ArrayList<ImageModelClass> imageList ;
     private ImageAdapter adapter ;
     // Firebase
     private FirebaseAuth mAuth ;
     private FirebaseStorage mStorage ;
     private StorageReference storageReference ;
     private DocumentReference mReference ;
+    private DatabaseReference realTimeRef ;
+
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -116,11 +127,13 @@ public class ProfileFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         parentHolder = inflater.inflate(R.layout.fragment_profile, container, false);
+        // Action bar activities
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setIcon(R.drawable.feedpost) ;
+
         initializeWidgets(parentHolder) ;
         initializeDatabase() ;
         setOnCLickListeners(parentHolder) ;
         setViewsAndResources(parentHolder) ;
-
 
         return parentHolder ;
     }
@@ -153,11 +166,14 @@ public class ProfileFragment extends Fragment {
         adapter = new ImageAdapter(imageList , getContext()) ;
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext() , 3) ;
         photoGalary.setLayoutManager(gridLayoutManager) ;
+        photoGalary.setAdapter(adapter);
+        photoGalary.setHasFixedSize(true);
     }
     // 2 .
     private void initializeDatabase(){
         mAuth = FirebaseAuth.getInstance() ;
         mStorage = FirebaseStorage.getInstance() ;
+        realTimeRef = FirebaseDatabase.getInstance().getReference() ;
         storageReference = mStorage.getReference().child("userUploads") ;
     }
     // 3 .
@@ -172,6 +188,11 @@ public class ProfileFragment extends Fragment {
     }
     // 4 .
     private void setViewsAndResources(View view){
+        // dummy views
+        userFollowers.setText("0");
+        userFollowings.setText("0");
+
+        photoGalary.setNestedScrollingEnabled(false) ;
         // set resources
         FirebaseUser user = mAuth.getCurrentUser() ;
         user.reload() ;
@@ -185,6 +206,7 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 currentUser = documentSnapshot.getString(documentFields.UserName) ;
+                ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(currentUser+"'s"+" "+"Profile");
                 currentUserBio = documentSnapshot.getString(documentFields.ProfileBio) ;
                 currentUsersGender = documentSnapshot.getString(documentFields.Gender) ;
                 userName.setText(currentUser) ;
@@ -230,8 +252,7 @@ public class ProfileFragment extends Fragment {
                             child(profileBgFile) ;
                     SetPicture(ref,profileBanner) ;
                 }
-                setImageGridViews(view);
-
+                setImageGridViews(UID , view);
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -240,36 +261,32 @@ public class ProfileFragment extends Fragment {
             }
         }) ;
     }
-    private void setImageGridViews(View view){
-        storageReference.child(currentUser).listAll().addOnSuccessListener(new OnSuccessListener<ListResult>() {
+    private void setImageGridViews(String Id ,View view){
+        realTimeRef.child("users").child(Id).
+                child(documentFields.realtimeFields.PostedPicture).addValueEventListener(new ValueEventListener() {
             @Override
-            public void onSuccess(ListResult listResult) {
-                for (StorageReference file : listResult.getItems()) {
-                    file.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                        @Override
-                        public void onSuccess(Uri uri) {
-                            //
-                            loadIndicate.setVisibility(View.GONE);
-                            imageList.add(uri.toString());
-                        }
-                    }).addOnSuccessListener(new OnSuccessListener<Uri>() {
-                        @Override
-                        public void onSuccess(Uri uri) {
-                            //
-                            photoGalary.setAdapter(adapter);
-                            photoGalary.setHasFixedSize(true);
-                            userPost.setText(String.valueOf(photoGalary.getAdapter().getItemCount()));
-                        }
-                    });
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()) {
+                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                        String postUid = dataSnapshot.child("postUid").getValue(String.class);
+                        String name = dataSnapshot.child("userName").getValue(String.class);
+                        String file = dataSnapshot.child("fileName").getValue(String.class);
+                        ImageModelClass imageModelClass = new ImageModelClass(postUid, name, file);
+                        imageList.add(imageModelClass);
+                        userPost.setText(String.valueOf(photoGalary.getAdapter().getItemCount()));
+                        loadIndicate.setVisibility(View.GONE);
+                        adapter.notifyDataSetChanged();
+                    }
                 }
+                else
+                    loadIndicate.setVisibility(View.GONE) ;
             }
-        }).addOnFailureListener(new OnFailureListener() {
+
             @Override
-            public void onFailure(@NonNull Exception e) {
-                showCustomToast("failed to fetch photos or there are none" , view);
+            public void onCancelled(@NonNull DatabaseError error) {
+
             }
         });
-
     }
     private void SetPicture(StorageReference reference , ImageView imageView){
         // Fetch the download URL for the image

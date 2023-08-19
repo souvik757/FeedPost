@@ -10,9 +10,7 @@ public class PostDataModel {
     private int countOfLike ;
     private int countOfComment ;
     private String adminComment ;
-    private StorageReference ref ;
-    private StorageReference ref1 ;
-    private StorageReference ref2 ;
+    private String ref ;
 
     public PostDataModel() {
     }
@@ -23,9 +21,7 @@ public class PostDataModel {
                          int countOfLike,
                          int countOfComment,
                          String adminComment ,
-                         StorageReference ref,
-                         StorageReference ref1,
-                         StorageReference ref2) {
+                         String ref) {
         this.ID = ID ;
         this.extractID = extractID ;
         this.adminName = adminName;
@@ -33,8 +29,6 @@ public class PostDataModel {
         this.countOfComment = countOfComment;
         this.adminComment = adminComment;
         this.ref = ref ;
-        this.ref1 = ref1 ;
-        this.ref2 = ref2 ;
     }
 
     public String getID() {
@@ -85,27 +79,11 @@ public class PostDataModel {
         this.adminComment = adminComment;
     }
 
-    public StorageReference getRef() {
+    public String getRef() {
         return ref;
     }
 
-    public void setRef(StorageReference ref) {
+    public void setRef(String ref) {
         this.ref = ref;
-    }
-
-    public StorageReference getRef1() {
-        return ref1;
-    }
-
-    public void setRef1(StorageReference ref1) {
-        this.ref1 = ref1;
-    }
-
-    public StorageReference getRef2() {
-        return ref2;
-    }
-
-    public void setRef2(StorageReference ref2) {
-        this.ref2 = ref2;
     }
 }

@@ -1,12 +1,14 @@
-package com.example.feedpost.Utility;
+package com.example.feedpost.Content.HomePage.HomeContents;
 
 public class LikeModel {
     private String name ;
+    private boolean like ;
     private String profileImgFile ;
 
-    public LikeModel(String name, String profileImgFile) {
+    public LikeModel(String name, boolean like, String profileImgFile) {
         this.name = name;
-        this.profileImgFile = profileImgFile;
+        this.like = like ;
+        this.profileImgFile = profileImgFile ;
     }
 
     public String getName() {
@@ -15,6 +17,14 @@ public class LikeModel {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public boolean isLike() {
+        return like;
+    }
+
+    public void setLike(boolean like) {
+        this.like = like;
     }
 
     public String getProfileImgFile() {

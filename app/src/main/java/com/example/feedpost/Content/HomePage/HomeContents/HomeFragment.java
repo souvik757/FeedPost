@@ -1,8 +1,11 @@
-package com.example.feedpost.Content.HomePage.HomeContents;
+package com.example.feedpost.Content.HomePage.HomeContents ;
 
+import android.animation.ObjectAnimator;
+import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -11,7 +14,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LayoutAnimationController;
 import android.widget.ProgressBar;
+import android.widget.ScrollView;
 
 import com.example.feedpost.R;
 import com.example.feedpost.Utility.documentFields;
@@ -39,6 +45,7 @@ import java.util.ArrayList;
 public class HomeFragment extends Fragment {
     View parentHolder ;
     // widgets
+    private ScrollView mScrollView ;
     private ProgressBar loadingBar ;
     private RecyclerView recyclerView ;
     // firebase
@@ -94,9 +101,11 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         parentHolder =  inflater.inflate(R.layout.fragment_home, container, false);
-        // customize action bar
-
+        //
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("FeedPost");
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setIcon(R.drawable.feedpost) ;
         initializeWidgets(parentHolder) ;
+        smoothenScrollView() ;
         initializeRawResources(parentHolder) ;
         initializeDatabase() ;
         fillListWithData() ;
@@ -108,8 +117,15 @@ public class HomeFragment extends Fragment {
     }
     // 1 .
     private void initializeWidgets(View view){
+        mScrollView = view.findViewById(R.id.contentScrollView) ;
         loadingBar = view.findViewById(R.id.loadContents) ;
         recyclerView = view.findViewById(R.id.publicPostView) ;
+    }
+    //   .
+    private void smoothenScrollView(){
+        ObjectAnimator anim = ObjectAnimator.ofInt(mScrollView, "scrollY", mScrollView.getBottom());
+        anim.setDuration(100);
+        anim.start();
     }
     // 2 .
     private void initializeRawResources(View view){
@@ -117,6 +133,7 @@ public class HomeFragment extends Fragment {
         adapter = new PostDataAdapter(view.getContext() , postArrayList) ;
         recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
         recyclerView.setAdapter(adapter) ;
+        recyclerView.setNestedScrollingEnabled(false) ;
         recyclerView.setHasFixedSize(true) ;
         recyclerView.addItemDecoration(new DividerItemDecoration(view.getContext() , LinearLayoutManager.VERTICAL));
     }
@@ -129,7 +146,7 @@ public class HomeFragment extends Fragment {
     private void fillListWithData(){
         // loading bar start . . .
         loadingBar.setVisibility(View.VISIBLE) ;
-        mRealDatabase.child("posts").addValueEventListener(new ValueEventListener() {
+        mRealDatabase.child("posts").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()){
@@ -150,19 +167,18 @@ public class HomeFragment extends Fragment {
                         // - image files
                         String image = dataSnapshot.child(documentFields.realtimePostFields.Admin)
                                 .child(documentFields.realtimePostFields._Admin_.CONTENTFILE).getValue(String.class)+".jpg" ;
-                        StorageReference storageReference1 = FirebaseStorage.getInstance().getReference()
-                                .child("userUploads").child(name).child(image) ;
-
-
 
                         dataModel.setID(Uid) ;
                         dataModel.setExtractID(extractedId) ;
                         dataModel.setAdminName(name) ;
                         dataModel.setAdminComment(comment) ;
-                        dataModel.setRef(storageReference1) ;
+                        dataModel.setRef(image) ;
 
                         postArrayList.add(dataModel) ;
                         loadingBar.setVisibility(View.GONE) ;
+
+                        // animation component
+                        AnimateRecyclerView(R.anim.animate_scale_in , getContext() , recyclerView) ;
 
                         adapter.notifyDataSetChanged() ;
                     }
@@ -172,6 +188,11 @@ public class HomeFragment extends Fragment {
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
-        }) ;
+        }); ;
+    }
+    /* animation component */
+    private void AnimateRecyclerView(int resId , Context context , RecyclerView recyclerView){
+        LayoutAnimationController animationController = AnimationUtils.loadLayoutAnimation(context , resId) ;
+        recyclerView.setLayoutAnimation(animationController) ;
     }
 }

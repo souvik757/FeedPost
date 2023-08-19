@@ -18,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.feedpost.CustomImageAdapter.ImageModelClass;
 import com.example.feedpost.R;
 import com.example.feedpost.Utility.documentFields;
 import com.example.feedpost.Utility.extract;
@@ -127,7 +128,7 @@ public class ImageUploadForPost extends AppCompatActivity {
                 // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
                 // ...
                 int length = fileName.length() ;
-                setEntryToRealtime(postUID , UID , name , extractID , comment , fileName.substring(0,length-4));
+                setEntryToRealtime(postUID , UID , name , extractID , comment , fileName.substring(0,length-4) , fileName);
                 progressBar.setVisibility(View.GONE);
 
             }
@@ -140,12 +141,25 @@ public class ImageUploadForPost extends AppCompatActivity {
             }
         }) ;
     }
-    private void setEntryToRealtime(String postUID , String id , String name , String extarctedemail , String comment , String contentfile){
-        mRealtime.child("posts").child(postUID).child(documentFields.realtimePostFields.Admin).child(documentFields.realtimePostFields._Admin_.ID)              .setValue(id) ;
-        mRealtime.child("posts").child(postUID).child(documentFields.realtimePostFields.Admin).child(documentFields.realtimePostFields._Admin_.NAME)            .setValue(name) ;
-        mRealtime.child("posts").child(postUID).child(documentFields.realtimePostFields.Admin).child(documentFields.realtimePostFields._Admin_.EXTRACED_EMAIL)  .setValue(extarctedemail) ;
-        mRealtime.child("posts").child(postUID).child(documentFields.realtimePostFields.Admin).child(documentFields.realtimePostFields._Admin_.COMMENT)         .setValue(comment) ;
-        mRealtime.child("posts").child(postUID).child(documentFields.realtimePostFields.Admin).child(documentFields.realtimePostFields._Admin_.CONTENTFILE)     .setValue(contentfile) ;
+    private void setEntryToRealtime(String postUID , String id , String name , String extarctedemail , String comment , String contentfile , String file){
+        // posts -> postUID -> Admin ->
+        mRealtime.child("posts").child(postUID).
+                child(documentFields.realtimePostFields.Admin).child(documentFields.realtimePostFields._Admin_.ID).setValue(id) ;
+        mRealtime.child("posts").child(postUID).
+                child(documentFields.realtimePostFields.Admin).child(documentFields.realtimePostFields._Admin_.NAME).setValue(name) ;
+        mRealtime.child("posts").child(postUID).
+                child(documentFields.realtimePostFields.Admin).child(documentFields.realtimePostFields._Admin_.EXTRACED_EMAIL).setValue(extarctedemail) ;
+        mRealtime.child("posts").child(postUID).
+                child(documentFields.realtimePostFields.Admin).child(documentFields.realtimePostFields._Admin_.COMMENT).setValue(comment) ;
+        mRealtime.child("posts").child(postUID).
+                child(documentFields.realtimePostFields.Admin).child(documentFields.realtimePostFields._Admin_.CONTENTFILE).setValue(contentfile) ;
+        // posts -> postUID -> Likes ->
+        mRealtime.child("posts").child(postUID).
+                child(documentFields.realtimePostFields.Likes).child(documentFields.realtimePostFields._Likes_.COUNT).setValue("0") ;
+        /*---------------------------*/
+        ImageModelClass imageModelClass = new ImageModelClass(postUID , name , file) ;
+        mRealtime.child("users").child(id).
+                child(documentFields.realtimeFields.PostedPicture).child(postUID).setValue(imageModelClass) ;
     }
     @Override
     public void onBackPressed() {

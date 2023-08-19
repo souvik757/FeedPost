@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,6 +24,8 @@ import java.util.ArrayList;
 public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.ViewHolder> {
     private Context context ;
     private ArrayList<UserListModel> dataLists ;
+    // Allows to remember the last item shown on screen
+    private int lastPosition = -1;
 
     public UserListAdapter(Context context, ArrayList<UserListModel> dataLists) {
         this.context = context;
@@ -68,10 +72,20 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.ViewHo
                 context.startActivity(tappedUser) ;
             }
         });
+        setAnimation(holder.itemView , position) ;
     }
 
     @Override
     public int getItemCount() {
         return dataLists.size() ;
+    }
+    private void setAnimation(View viewToAnimate, int position)
+    {
+        if (position > lastPosition)
+        {
+            Animation animation = AnimationUtils.loadAnimation(context, R.anim.scale_in_animation);
+            viewToAnimate.startAnimation(animation);
+            lastPosition = position;
+        }
     }
 }

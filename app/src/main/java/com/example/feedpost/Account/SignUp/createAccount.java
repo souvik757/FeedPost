@@ -112,13 +112,13 @@ public class createAccount extends AppCompatActivity {
                     showCustomToast("Invalid gender");
                     return ;
                 }
-                String firstName = String.valueOf(fName.getText()) ;
-                String lastName = String.valueOf(lName.getText()) ;
-                String fullName = extract.getName(firstName,lastName) ;
-                String usermail = String.valueOf(userEmail.getText()) ;
-                String collectionPath = extract.getDocument(usermail) ;
-                String userpass = String.valueOf(userPassword.getText()) ;
-                String gender = String.valueOf(spinner.getSelectedItem()) ;
+                String firstName = String.valueOf(fName.getText()).trim() ;
+                String lastName = String.valueOf(lName.getText()).trim() ;
+                String fullName = extract.getName(firstName,lastName).trim() ;
+                String usermail = String.valueOf(userEmail.getText()).trim() ;
+                String collectionPath = extract.getDocument(usermail).trim() ;
+                String userpass = String.valueOf(userPassword.getText()).trim() ;
+                String gender = String.valueOf(spinner.getSelectedItem()).trim() ;
                 mAuth.createUserWithEmailAndPassword(usermail , userpass).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
@@ -144,6 +144,7 @@ public class createAccount extends AppCompatActivity {
                         else{
                             // show custom toast
                             showCustomToast("Something went wrong");
+                            loadIndicator.setVisibility(View.GONE);
                         }
                     }
                 }) ;

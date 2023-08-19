@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -22,6 +23,11 @@ import com.example.feedpost.R;
 import com.example.feedpost.Utility.documentFields;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -30,6 +36,14 @@ import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 
+/**
+ * @implNote
+ * This adapter class is the main driver code
+ * - i. that will be interacting with database in realtime
+ * - ii. handling dynamic responses
+ * - iii. updating the database at the same time
+ * - this is possibly one of the most challenging part of this application .
+ */
 public class PostDataAdapter extends RecyclerView.Adapter<PostDataAdapter.PostViewHolder> {
     private int likeToggle = -1 ;
     private Context context ;
@@ -40,7 +54,9 @@ public class PostDataAdapter extends RecyclerView.Adapter<PostDataAdapter.PostVi
         this.context = context;
         this.postsList = postsList;
     }
-    /* ViewHolder class */
+    /**
+     *  ViewHolder class
+     */
     class PostViewHolder extends RecyclerView.ViewHolder{
         // initialize widgets from layout to be inflate
         private ImageView profilePic_L ;
@@ -76,7 +92,9 @@ public class PostDataAdapter extends RecyclerView.Adapter<PostDataAdapter.PostVi
         }
     }
 
-    /* @Override methods */
+    /**
+     * @Overrided methods
+     * */
     @NonNull
     @Override
     public PostViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -85,13 +103,16 @@ public class PostDataAdapter extends RecyclerView.Adapter<PostDataAdapter.PostVi
         return new PostViewHolder(view) ;
     }
 
+
+
+
+    /**
+     *  handle onClick & dynamic events here ...
+     */
     @Override
     public void onBindViewHolder(@NonNull PostViewHolder holder, int position) {
         PostDataModel dataModel = postsList.get(position) ;
         holder.setDetails(dataModel) ;
-        /* handle onClick & dynamic events here ... */
-        // write code here ...
-
         /* see profile */
         // 1 .
         holder.profilePic_L.setOnClickListener(new View.OnClickListener() {
@@ -115,28 +136,38 @@ public class PostDataAdapter extends RecyclerView.Adapter<PostDataAdapter.PostVi
             }
         });
 
-        /* set image content files */
-        SetPicture(dataModel.getRef()  , holder.content , context , holder) ;
+        /**
+         * set image content files
+         */
+        SetPicture(dataModel.getRef()  , holder.content , dataModel , context , holder) ;
 
-        /* set profile picture's */
+        /**
+         * set profile picture's
+         */
         SetProfilePics(dataModel.getExtractID(), dataModel.getID(), holder.profilePic_L , context) ;
         SetProfilePics(dataModel.getExtractID(), dataModel.getID(), holder.profilePic_S , context) ;
-
-        /* like button onCLick events */
+        /**
+         * Like counter
+         */
         holder.like.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 likeToggle++ ;
                 if(likeToggle%2 == 0){
                     holder.like.setBackground(context.getDrawable(R.drawable.baseline_favorite_24)) ;
+                    // make changes on realtime database
                     showCustomToast("liked" , v , R.drawable.baseline_favorite_24) ;
                 }
-                else
-                    holder.like.setBackground(context.getDrawable(R.drawable.baseline_favorite_border_24)) ;
+                else {
+                    holder.like.setBackground(context.getDrawable(R.drawable.baseline_favorite_border_24));
+                    // make changes on realtime database
+                }
             }
         });
 
-        /* comment layout */
+        /**
+         * comment layout
+         */
         String comment = String.valueOf(holder.comment.getText()) ;
         if(comment.isEmpty())
             holder.comment_layout.setVisibility(View.GONE) ;
@@ -148,8 +179,20 @@ public class PostDataAdapter extends RecyclerView.Adapter<PostDataAdapter.PostVi
     public int getItemCount() {
         return postsList.size() ;
     }
-    private void SetPicture(StorageReference reference , ImageView imageView , Context context , PostViewHolder holder){
+    /**
+     * Most DB activities should be performed within this adapter class :
+     * @param imgReference
+     * @param imageView
+     * @param dataModel
+     * @param context
+     * @param holder
+     */
+
+    private void SetPicture(String imgReference , ImageView imageView ,
+                            PostDataModel dataModel ,Context context , PostViewHolder holder){
         holder.loading.setVisibility(View.VISIBLE) ;
+        StorageReference reference = FirebaseStorage.getInstance().getReference().child("userUploads")
+                .child(dataModel.getAdminName()).child(imgReference) ;
         // Fetch the download URL for the image
         reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
@@ -165,6 +208,13 @@ public class PostDataAdapter extends RecyclerView.Adapter<PostDataAdapter.PostVi
             }
         });
     }
+    /**
+     *
+     * @param extractID
+     * @param ID
+     * @param imageView
+     * @param context
+     */
     private void SetProfilePics(String extractID, String ID, ImageView imageView , Context context){
         DocumentReference documentReference = FirebaseFirestore.getInstance().collection(extractID).document(ID) ;
         documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
@@ -197,6 +247,7 @@ public class PostDataAdapter extends RecyclerView.Adapter<PostDataAdapter.PostVi
                     }
                 }) ;
     }
+    //
     private void navigateToTappedProfile(String name){
         Intent i = new Intent(context , OthersProfileActivity.class) ;
         i.putExtra("TappedUsersName" , name) ;

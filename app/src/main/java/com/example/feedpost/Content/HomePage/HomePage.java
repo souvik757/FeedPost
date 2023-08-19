@@ -2,6 +2,7 @@ package com.example.feedpost.Content.HomePage;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -37,6 +38,7 @@ public class HomePage extends AppCompatActivity implements BottomNavigationView.
     }
     // 3 .
     private void setBottomNavigationView(){
+        bottomNavigationView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), android.R.color.transparent));
         bottomNavigationView.setOnNavigationItemSelectedListener(this);
         bottomNavigationView.setSelectedItemId(R.id.home);
     }

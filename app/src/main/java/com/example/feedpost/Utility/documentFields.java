@@ -13,6 +13,7 @@ public class documentFields {
         public static final String bio = "bio" ;
         public static final String hasProfilePic = "hasProfilePic"  ;
         public static final String hasProfileBg = "hasProfileBg"  ;
+        public static final String PostedPicture = "PostedPicture" ;
     }
     public static class realtimePostFields{
         public static final String Admin = "Admin" ;
@@ -24,7 +25,7 @@ public class documentFields {
             public static final String CONTENTFILE = "CONTENTFILE" ;
         }
         public static final String Likes = "Likes" ;
-        public static final class Likes {
+        public static final class _Likes_ {
             public static final String COUNT = "COUNT" ;
             public static final String PERSONS = "PERSONS" ;
         }

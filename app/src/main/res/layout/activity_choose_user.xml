@@ -2,6 +2,9 @@
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:nestedScrollingEnabled="true"
+    android:fitsSystemWindows="true"
+    android:fillViewport="true"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Content.UsersList.chooseUserActivity">
@@ -17,6 +20,7 @@
             android:layout_gravity="center"/>
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/usersCardView"
+            android:nestedScrollingEnabled="false"
             android:layout_margin="8dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
