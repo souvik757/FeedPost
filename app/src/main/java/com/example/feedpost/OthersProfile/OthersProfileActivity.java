@@ -20,17 +20,27 @@ import com.bumptech.glide.Glide;
 import com.example.feedpost.CustomImageAdapter.ImageAdapter;
 import com.example.feedpost.CustomImageAdapter.ImageModelClass;
 import com.example.feedpost.R;
+import com.example.feedpost.Utility.DatabaseKeys;
 import com.example.feedpost.Utility.documentFields;
+import com.example.feedpost.Utility.extract;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.ListResult;
 import com.google.firebase.storage.StorageReference;
+
+import org.checkerframework.checker.guieffect.qual.UI;
 
 import java.util.ArrayList;
 
@@ -45,6 +55,7 @@ public class OthersProfileActivity extends AppCompatActivity {
     private TextView posts ;
     private ImageView profilePic ;
     private ImageView profileBanner ;
+    private ExtendedFloatingActionButton followBtn ;
     // resources
     private String tempUser ;
     private String tempUserGender ;
@@ -52,7 +63,9 @@ public class OthersProfileActivity extends AppCompatActivity {
     private ImageAdapter adapter ;
     // Firebase
     private FirebaseStorage mStorage ;
+    private FirebaseAuth mAuth ;
     private StorageReference mReference ;
+    private DocumentReference storeReference ;
     private DatabaseReference mRealDatabase ;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +77,7 @@ public class OthersProfileActivity extends AppCompatActivity {
         initializeDatabase() ;
         setProfileModelArrayList() ;
         setViewContents() ;
+        followEvent() ;
     }
     // 1 .
     private void initializeWidgetsAndVariables(){
@@ -83,6 +97,7 @@ public class OthersProfileActivity extends AppCompatActivity {
         profilePic = findViewById(R.id.usersProfilePic) ;
         profileBanner = findViewById(R.id.backgroundBanner) ;
         posts = findViewById(R.id.usersProfilePostNumber) ;
+        followBtn = findViewById(R.id.followUser) ;
 
         imageList = new ArrayList<>() ;
         adapter = new ImageAdapter(imageList , this) ;
@@ -93,6 +108,7 @@ public class OthersProfileActivity extends AppCompatActivity {
     }
     // 2 .
     private void initializeDatabase(){
+        mAuth = FirebaseAuth.getInstance() ;
         mStorage = FirebaseStorage.getInstance() ;
         mReference = mStorage.getReference().child("userUploads") ;
         mRealDatabase = FirebaseDatabase.getInstance().getReference() ;
@@ -103,17 +119,18 @@ public class OthersProfileActivity extends AppCompatActivity {
         mRealDatabase.child("users").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()){
-                    String name = dataSnapshot.child(documentFields.realtimeFields.fullName).getValue(String.class) ;
+                for (DataSnapshot userSnap : snapshot.getChildren()){
+                    String name = userSnap.child(documentFields.realtimeFields.fullName).getValue(String.class) ;
                     if(tempUser.equals(name)){
-                        dataSnapshot.getRef().child(documentFields.realtimeFields.PostedPicture).addValueEventListener(new ValueEventListener() {
+                        // 👇 this part needs improvement
+                        userSnap.getRef().child(documentFields.realtimeFields.PostedPicture).addValueEventListener(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
                                 if(snapshot.exists()) {
-                                    for (DataSnapshot snapshot1 : snapshot.getChildren()) {
-                                        String postUid = snapshot1.child("postUid").getValue(String.class);
-                                        String name =    snapshot1.child("userName").getValue(String.class);
-                                        String file =    snapshot1.child("fileName").getValue(String.class);
+                                    for (DataSnapshot userPostSnap : snapshot.getChildren()) {
+                                        String postUid = userPostSnap.child("postUid").getValue(String.class);
+                                        String name =    userPostSnap.child("userName").getValue(String.class);
+                                        String file =    userPostSnap.child("fileName").getValue(String.class);
                                         if (!name.isEmpty() && !file.isEmpty()) {
                                             ImageModelClass imageModelClass = new ImageModelClass(postUid, name, file);
                                             imageList.add(imageModelClass);
@@ -132,6 +149,7 @@ public class OthersProfileActivity extends AppCompatActivity {
 
                             }
                         }) ;
+                        // 👆 - - - - - - needs modification
                     }
                 }
             }
@@ -143,14 +161,122 @@ public class OthersProfileActivity extends AppCompatActivity {
         }) ;
     }
     // 4 .
+    private void followEvent(){
+        String myID = mAuth.getCurrentUser().getUid() ;
+
+
+        mRealDatabase.child(DatabaseKeys.Realtime.users).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot usersSnapShots : snapshot.getChildren()){
+                    String uid = usersSnapShots.getKey() ;
+                    DataSnapshot followingSnapShot = usersSnapShots.child(DatabaseKeys.Realtime.following) ;
+                    for (DataSnapshot followingInfo : followingSnapShot.getChildren()){
+                        String name = followingInfo.child("name").getValue(String.class) ;
+                        if(tempUser.equals(name)){
+                            followBtn.setText("following");
+                            followBtn.setBackgroundColor(getResources().getColor(R.color.blue_dark)) ;
+                            followBtn.setClickable(false);
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                throw error.toException() ;
+            }
+        });
+
+        followBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // update following of current User
+                updateMyFollowing(myID) ;
+                // update follower of clicked user
+                String documentPath = extract.getDocument(mAuth.getCurrentUser().getEmail()) ;
+                String UID = mAuth.getCurrentUser().getUid() ;
+                storeReference = FirebaseFirestore.getInstance().collection(documentPath).document(UID);
+                storeReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        String name = documentSnapshot.getString(documentFields.UserName) ;
+                        updateOthersFollower(myID , name) ;
+                        followBtn.setText("following");
+                        followBtn.setBackgroundColor(getResources().getColor(R.color.blue_dark)) ;
+                        followBtn.setClickable(false);
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        e.printStackTrace() ;
+                    }
+                }) ;
+            }
+        });
+    }
+
+    /**
+     * updating my followings in realtime db
+     */
+    private void updateMyFollowing(String UID) {
+        mRealDatabase.child(DatabaseKeys.Realtime.users).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot users : snapshot.getChildren()){
+                    String uid = users.getKey() ;
+                    // confirm uid by name
+                    String name= users.child(documentFields.realtimeFields.fullName).getValue(String.class) ;
+                    if(tempUser.equals(name)){
+                        // add to my following
+                        DatabaseReference ref = FirebaseDatabase.getInstance().getReference() ;
+                        ref.child(DatabaseKeys.Realtime.users).child(UID).child(DatabaseKeys.Realtime.following).child(uid)
+                                .child("name").setValue(name) ;
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                throw error.toException() ;
+            }
+        }); ;
+    }
+
+    /**
+     * update others follower
+     */
+    private void updateOthersFollower(String UID,String myName) {
+        mRealDatabase.child(DatabaseKeys.Realtime.users).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot users : snapshot.getChildren()){
+                    String uid = users.getKey() ;
+                    String name = users.child(documentFields.realtimeFields.fullName).getValue(String.class) ;
+                    if(tempUser.equals(name)){
+                        DatabaseReference ref = FirebaseDatabase.getInstance().getReference() ;
+                        ref.child(DatabaseKeys.Realtime.users).child(uid).child(DatabaseKeys.Realtime.follower).child(UID).
+                                child("name").setValue(myName) ;
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        }); ;
+    }
+
+    // 5 .
     private void setViewContents(){
         profileName.setText(tempUser) ;
-        mRealDatabase.child("users").addValueEventListener(new ValueEventListener() {
+        mRealDatabase.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()){
-                    String name = dataSnapshot.child(documentFields.realtimeFields.fullName).getValue(String.class) ;
 
+                    String name = dataSnapshot.child(documentFields.realtimeFields.fullName).getValue(String.class) ;
                     if(name.equals(tempUser)){
                         String gender = dataSnapshot.child(documentFields.realtimeFields.gender).getValue(String.class) ;
                         String bio = dataSnapshot.child(documentFields.realtimeFields.bio).getValue(String.class) ;
@@ -190,7 +316,7 @@ public class OthersProfileActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
-        }) ;
+        }); ;
     }
     //  .
     private void SetPicture(StorageReference reference , ImageView imageView){
@@ -217,7 +343,7 @@ public class OthersProfileActivity extends AppCompatActivity {
         TextView txt = layout.findViewById(R.id.textViewToast) ;
         txt.setText(message);
         Toast toast = new Toast(getApplicationContext()) ;
-        toast.setDuration(Toast.LENGTH_LONG) ;
+        toast.setDuration(Toast.LENGTH_SHORT) ;
         toast.setView(layout);
         toast.show() ;
     }

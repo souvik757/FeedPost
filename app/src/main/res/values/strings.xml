@@ -1,5 +1,9 @@
 <resources>
     <string name="app_name">FeedPost</string>
+    // splash screen res
+    <string name="proceed">continue</string>
+    <string name="earlyTxt">This is an early version , errors are expected</string>
+
     // string resources
     <string name="useremail">email</string>
     <string name="password">password</string>

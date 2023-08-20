@@ -154,6 +154,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
                 <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+                    android:id="@+id/followUser"
                     android:text="@string/follow"
                     android:layout_width="100dp"
                     android:layout_height="50dp"

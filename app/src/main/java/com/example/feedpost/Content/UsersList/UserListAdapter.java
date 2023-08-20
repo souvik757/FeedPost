@@ -75,6 +75,8 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.ViewHo
         setAnimation(holder.itemView , position) ;
     }
 
+
+
     @Override
     public int getItemCount() {
         return dataLists.size() ;

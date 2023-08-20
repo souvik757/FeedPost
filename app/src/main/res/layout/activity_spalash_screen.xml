@@ -1,53 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView
+    android:id="@+id/scrollViewBg"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity="center"
+    android:fillViewport="true"
     android:orientation="vertical"
+    android:background="@drawable/titlenight"
     tools:context=".spalashScreen">
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_gravity="center">
-        <ImageView
-            android:background="@drawable/feedpost"
-            android:layout_margin="20dp"
-            android:layout_width="60dp"
-            android:layout_height="60dp"/>
+        android:layout_height="wrap_content">
         <ProgressBar
             android:id="@+id/progressBar"
             android:visibility="gone"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_gravity="center"/>
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_gravity="center"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_margin="@dimen/commonMargin"
+            android:layout_width="30dp"
+            android:layout_height="30dp"/>
+        <ImageView
+            android:id="@+id/iconLogo"
+            android:src="@drawable/feedpost"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_above="@+id/appName"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"
+            android:contentDescription="@string/app_name" />
+        <TextView
+            android:id="@+id/appName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:textStyle="bold"
+            android:padding="@dimen/commonMargin"
+            android:text="@string/app_name"
+            android:textColor="@color/green_light"
+            android:textSize="25sp"/>
+        <com.google.android.material.button.MaterialButton
+            android:layout_below="@+id/appName"
+            android:id="@+id/consentButton"
+            android:layout_centerHorizontal="true"
             android:layout_margin="@dimen/commonMargin"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-            <MultiAutoCompleteTextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="@dimen/commonMargin"
-                android:text="@string/app_name"
-                android:layout_gravity="center"
-                android:textSize="20sp"/>
-        </com.google.android.material.textfield.TextInputLayout>
+            android:layout_height="wrap_content"
+            android:text="@string/proceed"/>
         <TextView
-            android:layout_gravity="center"
+            android:id="@+id/earlyVersionMessege"
+            android:textColor="@color/orange"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentBottom="true"
+            android:layout_margin="@dimen/commonMargin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="This is an early version , errors are expected"/>
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/consentButton"
-            android:layout_gravity="center"
-            android:layout_margin="20dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="continue"/>
-    </LinearLayout>
+            android:text="@string/earlyTxt"/>
+    </RelativeLayout>
 </ScrollView>

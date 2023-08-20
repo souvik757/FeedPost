@@ -188,6 +188,7 @@ public class ProfileFragment extends Fragment {
     }
     // 4 .
     private void setViewsAndResources(View view){
+        loadIndicate.setVisibility(View.VISIBLE);
         // dummy views
         userFollowers.setText("0");
         userFollowings.setText("0");
@@ -196,12 +197,12 @@ public class ProfileFragment extends Fragment {
         // set resources
         FirebaseUser user = mAuth.getCurrentUser() ;
         user.reload() ;
-        if(user.isEmailVerified())
+        if(user.isEmailVerified()) {
             profileVerified.setImageResource(R.drawable.verified);
+        }
         String documentPath = extract.getDocument(mAuth.getCurrentUser().getEmail()) ;
         String UID = mAuth.getCurrentUser().getUid() ;
         mReference = FirebaseFirestore.getInstance().collection(documentPath).document(UID);
-        loadIndicate.setVisibility(View.VISIBLE);
         mReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
