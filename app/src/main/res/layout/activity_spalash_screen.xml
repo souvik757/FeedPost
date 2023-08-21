@@ -10,7 +10,7 @@
     android:fillViewport="true"
     android:orientation="vertical"
     android:background="@drawable/titlenight"
-    tools:context=".spalashScreen">
+    tools:context=".SplashActivities.spalashScreen">
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">

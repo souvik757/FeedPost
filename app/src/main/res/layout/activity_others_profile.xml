@@ -1,185 +1,190 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    android:id="@+id/scroll"
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+    android:id="@+id/slideDownToRefresh"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true"
-    android:fitsSystemWindows="true"
-    android:nestedScrollingEnabled="true"
     tools:context=".OthersProfile.OthersProfileActivity">
-    <RelativeLayout
+    <ScrollView
+        android:id="@+id/scroll"
+        android:fillViewport="true"
+        android:fitsSystemWindows="true"
+        android:nestedScrollingEnabled="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-
         <RelativeLayout
-            android:id="@+id/profileComponent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            <ImageView
-                android:id="@+id/backgroundBanner"
-                android:layout_alignParentTop="true"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:adjustViewBounds="true"
-                android:scaleType="fitCenter"/>
+
             <RelativeLayout
-                android:background="@drawable/custom_background"
-                android:layout_alignParentTop="true"
-                android:layout_marginTop="200dp"
+                android:id="@+id/profileComponent"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="200dp">
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/view2"
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
-                    android:layout_marginStart="30dp"
-                    android:layout_marginTop="12dp"
-                    android:elevation="12dp"
-                    app:cardCornerRadius="60dp">
-                    <ImageView
-                        android:id="@+id/usersProfilePic"
-                        android:layout_height="80dp"
-                        android:layout_width="80dp"
-                        android:scaleType="centerCrop"
-                        android:adjustViewBounds="true"/>
-                </androidx.cardview.widget.CardView>
-                <LinearLayout
-                    android:id="@+id/view3"
-                    android:layout_below="@+id/view2"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginStart="@dimen/commonMargin"
+                android:layout_height="wrap_content">
+                <ImageView
+                    android:id="@+id/backgroundBanner"
+                    android:layout_alignParentTop="true"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitCenter"/>
+                <RelativeLayout
+                    android:background="@drawable/custom_background"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginTop="200dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="200dp">
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/view2"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:layout_marginStart="30dp"
+                        android:layout_marginTop="12dp"
+                        android:elevation="12dp"
+                        app:cardCornerRadius="60dp">
+                        <ImageView
+                            android:id="@+id/usersProfilePic"
+                            android:layout_height="80dp"
+                            android:layout_width="80dp"
+                            android:scaleType="centerCrop"
+                            android:adjustViewBounds="true"/>
+                    </androidx.cardview.widget.CardView>
+                    <LinearLayout
+                        android:id="@+id/view3"
+                        android:layout_below="@+id/view2"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginStart="@dimen/commonMargin"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+                        <TextView
+                            android:id="@+id/usersProfileName"
+                            android:textSize="20sp"
+                            android:textColor="@color/white"
+                            android:textStyle="bold"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+                        <ImageView
+                            android:id="@+id/user_verified"
+                            android:layout_width="15dp"
+                            android:layout_height="15dp"/>
+                    </LinearLayout>
                     <TextView
-                        android:id="@+id/usersProfileName"
-                        android:textSize="20sp"
-                        android:textColor="@color/white"
+                        android:id="@+id/usersProfileGender"
+                        android:layout_below="@+id/view3"
+                        android:layout_marginStart="@dimen/commonMargin"
+                        android:textSize="10sp"
+                        android:textColor="@color/sky"
                         android:textStyle="bold"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"/>
-                    <ImageView
-                        android:id="@+id/user_verified"
-                        android:layout_width="15dp"
-                        android:layout_height="15dp"/>
-                </LinearLayout>
-                <TextView
-                    android:id="@+id/usersProfileGender"
-                    android:layout_below="@+id/view3"
-                    android:layout_marginStart="@dimen/commonMargin"
-                    android:textSize="10sp"
-                    android:textColor="@color/sky"
-                    android:textStyle="bold"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-                <LinearLayout
-                    android:id="@+id/layout2"
-                    android:layout_alignParentEnd="true"
-                    android:layout_alignParentTop="true"
-                    android:layout_centerVertical="true"
-                    android:layout_centerHorizontal="true"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="32dp">
                     <LinearLayout
+                        android:id="@+id/layout2"
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentTop="true"
+                        android:layout_centerVertical="true"
+                        android:layout_centerHorizontal="true"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:background="?android:attr/selectableItemBackground">
-                        <TextView
-                            android:id="@+id/usersProfilePostNumber"
-                            android:textStyle="bold"
-                            android:textSize="25sp"
-                            android:textColor="@color/white"
+                        android:layout_margin="32dp">
+                        <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"/>
-                        <TextView
+                            android:orientation="vertical"
+                            android:background="?android:attr/selectableItemBackground">
+                            <TextView
+                                android:id="@+id/usersProfilePostNumber"
+                                android:textStyle="bold"
+                                android:textSize="25sp"
+                                android:textColor="@color/white"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_horizontal"/>
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/white"
+                                android:text="@string/posts"/>
+                        </LinearLayout>
+                        <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/white"
-                            android:text="@string/posts"/>
+                            android:layout_marginStart="20dp"
+                            android:layout_marginEnd="20dp"
+                            android:orientation="vertical"
+                            android:background="?android:attr/selectableItemBackground">
+                            <TextView
+                                android:id="@+id/usersProfileFollowerNumber"
+                                android:textStyle="bold"
+                                android:textColor="@color/white"
+                                android:textSize="25sp"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_horizontal"/>
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/white"
+                                android:text="@string/followers"/>
+                        </LinearLayout>
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:background="?android:attr/selectableItemBackground">
+                            <TextView
+                                android:id="@+id/usersProfileFollowingNumber"
+                                android:textColor="@color/white"
+                                android:textStyle="bold"
+                                android:textSize="25sp"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_horizontal"/>
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/white"
+                                android:text="@string/following"/>
+                        </LinearLayout>
                     </LinearLayout>
-                    <LinearLayout
+                    <TextView
+                        android:id="@+id/usersProfileBio"
+                        android:textColor="@color/white"
+                        android:textSize="14sp"
+                        android:layout_below="@+id/view3"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginStart="@dimen/commonMargin"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="20dp"
-                        android:layout_marginEnd="20dp"
-                        android:orientation="vertical"
-                        android:background="?android:attr/selectableItemBackground">
-                        <TextView
-                            android:id="@+id/usersProfileFollowerNumber"
-                            android:textStyle="bold"
-                            android:textColor="@color/white"
-                            android:textSize="25sp"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"/>
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textColor="@color/white"
-                            android:text="@string/followers"/>
-                    </LinearLayout>
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:background="?android:attr/selectableItemBackground">
-                        <TextView
-                            android:id="@+id/usersProfileFollowingNumber"
-                            android:textColor="@color/white"
-                            android:textStyle="bold"
-                            android:textSize="25sp"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"/>
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textColor="@color/white"
-                            android:text="@string/following"/>
-                    </LinearLayout>
-                </LinearLayout>
-                <TextView
-                    android:id="@+id/usersProfileBio"
-                    android:textColor="@color/white"
-                    android:textSize="14sp"
-                    android:layout_below="@+id/view3"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginStart="@dimen/commonMargin"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-                <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-                    android:id="@+id/followUser"
-                    android:text="@string/follow"
-                    android:layout_width="100dp"
-                    android:layout_height="50dp"
-                    android:layout_alignParentEnd="true"
-                    android:layout_marginEnd="@dimen/commonMargin"
-                    android:layout_below="@+id/layout2"/>
+                        android:layout_height="wrap_content"/>
+                    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+                        android:id="@+id/followUser"
+                        android:text="@string/follow"
+                        android:layout_width="100dp"
+                        android:layout_height="50dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_marginEnd="@dimen/commonMargin"
+                        android:layout_below="@+id/layout2"/>
+                </RelativeLayout>
             </RelativeLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/usersUploadGrid"
+                android:nestedScrollingEnabled="false"
+                android:layout_below="@+id/profileComponent"
+                android:background="@color/transparent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"/>
+            <ProgressBar
+                android:id="@+id/profileFetching"
+                android:visibility="gone"
+                android:layout_below="@+id/profileComponent"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
+                android:layout_marginTop="90dp"
+                android:layout_centerHorizontal="true"/>
         </RelativeLayout>
+    </ScrollView>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/usersUploadGrid"
-            android:nestedScrollingEnabled="false"
-            android:layout_below="@+id/profileComponent"
-            android:background="@color/transparent"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"/>
-        <ProgressBar
-            android:id="@+id/profileFetching"
-            android:visibility="gone"
-            android:layout_below="@+id/profileComponent"
-            android:layout_width="52dp"
-            android:layout_height="52dp"
-            android:layout_marginTop="90dp"
-            android:layout_centerHorizontal="true"/>
-
-    </RelativeLayout>
-</ScrollView>
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

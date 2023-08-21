@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -52,8 +53,10 @@ import java.util.ArrayList;
  * Use the {@link ProfileFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ProfileFragment extends Fragment {
+public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener{
     View parentHolder ;
+    // layouts
+    private SwipeRefreshLayout swipeRefreshLayout ;
     private ScrollView scrollview ;
     // widgets
     private FloatingActionButton edit ;
@@ -127,15 +130,25 @@ public class ProfileFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         parentHolder = inflater.inflate(R.layout.fragment_profile, container, false);
-        // Action bar activities
-        ((AppCompatActivity)getActivity()).getSupportActionBar().setIcon(R.drawable.feedpost) ;
+        init() ;
 
+        swipeRefreshLayout = parentHolder.findViewById(R.id.pullToRefresh) ;
+        swipeRefreshLayout.setOnRefreshListener(this) ;
+        return parentHolder ;
+    }
+
+    @Override
+    public void onRefresh() {
+        init() ;
+        swipeRefreshLayout.setRefreshing(false);
+    }
+
+    // 0 .
+    private void init(){
         initializeWidgets(parentHolder) ;
         initializeDatabase() ;
         setOnCLickListeners(parentHolder) ;
         setViewsAndResources(parentHolder) ;
-
-        return parentHolder ;
     }
 
     // 1 .
@@ -319,7 +332,7 @@ public class ProfileFragment extends Fragment {
         TextView txt = layout.findViewById(R.id.textViewToast) ;
         txt.setText(message);
         Toast toast = new Toast(getContext()) ;
-        toast.setDuration(Toast.LENGTH_LONG) ;
+        toast.setDuration(Toast.LENGTH_SHORT) ;
         toast.setView(layout);
         toast.show() ;
     }

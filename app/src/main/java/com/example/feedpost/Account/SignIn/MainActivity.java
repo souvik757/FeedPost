@@ -19,9 +19,9 @@ import android.widget.Toast;
 import com.example.feedpost.Account.SignUp.createAccount;
 import com.example.feedpost.Content.HomePage.HomePage;
 import com.example.feedpost.R;
+import com.example.feedpost.SplashActivities.splashScreen;
 import com.example.feedpost.Utility.documentFields;
 import com.example.feedpost.Utility.extract;
-import com.example.feedpost.spalashScreen;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
     private void showConsent(){
         // showSplash
         if(mAuth.getCurrentUser() == null) {
-            startActivity(new Intent(MainActivity.this, spalashScreen.class));
+            startActivity(new Intent(MainActivity.this, splashScreen.class));
             // perform onclick events
 
         }

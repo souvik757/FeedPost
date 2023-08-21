@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.net.Uri;
 import android.os.Bundle;
@@ -44,7 +45,9 @@ import org.checkerframework.checker.guieffect.qual.UI;
 
 import java.util.ArrayList;
 
-public class OthersProfileActivity extends AppCompatActivity {
+public class OthersProfileActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
+    // layouts
+    private SwipeRefreshLayout swipeRefreshLayout ;
     // widgets
     private ScrollView scrollView ;
     private RecyclerView gridView ;
@@ -72,7 +75,20 @@ public class OthersProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_others_profile);
         tempUser = getIntent().getStringExtra("TappedUsersName") ;
+        init() ;
 
+        swipeRefreshLayout = findViewById(R.id.slideDownToRefresh) ;
+        swipeRefreshLayout.setOnRefreshListener(this);
+
+    }
+
+    @Override
+    public void onRefresh() {
+        init() ;
+        swipeRefreshLayout.setRefreshing(false);
+    }
+
+    private void init(){
         initializeWidgetsAndVariables() ;
         initializeDatabase() ;
         setProfileModelArrayList() ;

@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,8 +43,10 @@ import java.util.ArrayList;
  * Use the {@link HomeFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class HomeFragment extends Fragment {
+public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener{
+    // layouts
     View parentHolder ;
+    private SwipeRefreshLayout swipeRefreshLayout ;
     // widgets
     private ScrollView mScrollView ;
     private ProgressBar loadingBar ;
@@ -101,19 +104,28 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         parentHolder =  inflater.inflate(R.layout.fragment_home, container, false);
-        //
+        init() ;
+        // swipe refresh
+        swipeRefreshLayout = (SwipeRefreshLayout) parentHolder.findViewById(R.id.swipeToRefresh) ;
+        swipeRefreshLayout.setOnRefreshListener(this);
+
+        return parentHolder ;
+    }
+
+    @Override
+    public void onRefresh() {
+        init() ;
+        swipeRefreshLayout.setRefreshing(false);
+    }
+
+    // 0 .
+    private void init(){
         ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("FeedPost");
-        ((AppCompatActivity)getActivity()).getSupportActionBar().setIcon(R.drawable.feedpost) ;
         initializeWidgets(parentHolder) ;
         smoothenScrollView() ;
         initializeRawResources(parentHolder) ;
         initializeDatabase() ;
         fillListWithData() ;
-
-
-
-
-        return parentHolder ;
     }
     // 1 .
     private void initializeWidgets(View view){

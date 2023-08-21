@@ -17,6 +17,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.feedpost.R;
 import com.example.feedpost.Utility.documentFields;
@@ -37,7 +38,9 @@ import org.checkerframework.checker.guieffect.qual.UI;
 
 import java.util.ArrayList;
 
-public class chooseUserActivity extends AppCompatActivity {
+public class chooseUserActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
+    // layouts
+    private SwipeRefreshLayout swipeRefreshLayout ;
     // resources
     private String currentUserName ;
     // widgets
@@ -55,7 +58,19 @@ public class chooseUserActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choose_user);
+        init() ;
+        swipeRefreshLayout = findViewById(R.id.swipeRefresh) ;
+        swipeRefreshLayout.setOnRefreshListener(this);
 
+    }
+
+    @Override
+    public void onRefresh() {
+        init() ;
+        swipeRefreshLayout.setRefreshing(false);
+    }
+
+    private void init(){
         initializeWidgetsAndVariables() ;
         initializeDatabase() ;
         fillListWithData() ;
@@ -164,7 +179,7 @@ public class chooseUserActivity extends AppCompatActivity {
         TextView txt = layout.findViewById(R.id.textViewToast) ;
         txt.setText(message);
         Toast toast = new Toast(getApplicationContext()) ;
-        toast.setDuration(Toast.LENGTH_LONG) ;
+        toast.setDuration((int)1200) ;
         toast.setView(layout);
         toast.show() ;
     }

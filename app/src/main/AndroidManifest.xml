@@ -59,7 +59,7 @@
             android:screenOrientation="portrait"
             android:exported="false" />
         <activity
-            android:name=".spalashScreen"
+            android:name=".SplashActivities.splashScreen"
             android:screenOrientation="portrait"
             android:exported="false" />
         <activity

@@ -1,9 +1,5 @@
-package com.example.feedpost;
+package com.example.feedpost.SplashActivities;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
@@ -12,17 +8,13 @@ import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.material.badge.BadgeUtils;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
+import androidx.appcompat.app.AppCompatActivity;
 
-public class spalashScreen extends AppCompatActivity {
+import com.example.feedpost.R;
+
+public class splashScreen extends AppCompatActivity {
     // widgets
     private Button consentBtn ;
     private ImageView img ;
@@ -46,7 +38,7 @@ public class spalashScreen extends AppCompatActivity {
     }
     // 2 .
     private void setAnimation(){
-        Animation anim = AnimationUtils.loadAnimation(getApplicationContext() , R.anim.scale_in_animation) ;
+        Animation anim = AnimationUtils.loadAnimation(getApplicationContext() , android.R.anim.slide_in_left) ;
         img.setAnimation(anim);
         new Handler().postDelayed(()->{
             Animation anim1 = AnimationUtils.loadAnimation(getApplicationContext() , android.R.anim.fade_out) ;
