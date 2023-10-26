@@ -37,8 +37,11 @@ public class documentFields {
         }
         public static final String Likes = "Likes" ;
         public static final class _Likes_ {
-            public static final String COUNT = "COUNT" ;
-            public static final String PERSONS = "PERSONS" ;
+            public static final String name = "name" ;
+        }
+        public static final String Comments = "Comments" ;
+        public static final class _Comments_ {
+            public static final String name = "name" ;
         }
     }
 }

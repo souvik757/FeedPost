@@ -18,13 +18,17 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.feedpost.R;
+import com.example.feedpost.Utility.DatabaseKeys;
 import com.example.feedpost.Utility.documentFields;
 import com.example.feedpost.Utility.extract;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -72,15 +76,12 @@ public class ImageUploadBackGround extends AppCompatActivity {
     public void updateBackground(View view) {
         loadingBar.setVisibility(View.VISIBLE);
         String UID = mAuth.getCurrentUser().getUid();
-        String email = mAuth.getCurrentUser().getEmail();
-        String extractID = extract.getDocument(email);
-        mReference = mFirestore.collection(extractID).document(UID);
-
-        mReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+        mRealtime.child(DatabaseKeys.Realtime.users).child(UID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                if (documentSnapshot.exists()) {
-                    String name = documentSnapshot.getString(documentFields.UserName);
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()){
+                    String name = snapshot.child(documentFields.realtimeFields.fullName).getValue(String.class) ;
+                    // showCustomToast(name , view);
                     // Get the data from an ImageView as bytes
                     previewBackground.setDrawingCacheEnabled(true);
                     previewBackground.buildDrawingCache();
@@ -100,33 +101,18 @@ public class ImageUploadBackGround extends AppCompatActivity {
                     }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
-                            // ...
-                            Map<String, Object> data = new HashMap<>();
-                            data.put(documentFields.ProfileBG, fileName);
-                            mReference.update(data).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void unused) {
-                                    mRealtime.child("users").child(UID).
-                                            child(documentFields.realtimeFields.hasProfileBg).
-                                            setValue(true);
-                                    mRealtime.child("users").child(UID).
-                                            child("profile").
-                                            child("profileBgFile").
-                                            setValue(fileName) ;
-                                    loadingBar.setVisibility(View.GONE);
-                                    finish();
-                                }
-                            }).addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    loadingBar.setVisibility(View.GONE);
-                                    showCustomToast("Something went wrong", view);
-                                }
-                            });
+                            mRealtime.child("users").child(UID).child(documentFields.realtimeFields.hasProfileBg).setValue(true);
+                            mRealtime.child("users").child(UID).child("profile").child("profileBgFile").setValue(fileName) ;
+                            loadingBar.setVisibility(View.GONE);
+                            finish();
                         }
                     });
                 }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
             }
         });
     }

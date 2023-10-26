@@ -64,16 +64,4 @@ public class HomePage extends AppCompatActivity implements BottomNavigationView.
 
         return false;
     }
-    private void showCustomToast(String message){
-        LayoutInflater inflater = getLayoutInflater() ;
-        View layout = inflater.inflate(R.layout.custom_toast_layout , (ViewGroup) findViewById(R.id.containerToast)) ;
-        ImageView img = layout.findViewById(R.id.imageViewToast) ;
-        img.setImageResource(R.drawable.warning);
-        TextView txt = layout.findViewById(R.id.textViewToast) ;
-        txt.setText(message);
-        Toast toast = new Toast(getApplicationContext()) ;
-        toast.setDuration(Toast.LENGTH_LONG) ;
-        toast.setView(layout);
-        toast.show() ;
-    }
 }

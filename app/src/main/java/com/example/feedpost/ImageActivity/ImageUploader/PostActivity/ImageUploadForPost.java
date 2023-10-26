@@ -20,13 +20,17 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.feedpost.CustomImageAdapter.ImageModelClass;
 import com.example.feedpost.R;
+import com.example.feedpost.Utility.DatabaseKeys;
 import com.example.feedpost.Utility.documentFields;
 import com.example.feedpost.Utility.extract;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -95,18 +99,21 @@ public class ImageUploadForPost extends AppCompatActivity {
             String UID = mAuth.getCurrentUser().getUid();
             String email = mAuth.getCurrentUser().getEmail();
             String extractID = extract.getDocument(email);
-            mReference = mFirestore.collection(extractID).document(UID);
-
-            mReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            mRealtime.child(DatabaseKeys.Realtime.users).child(UID).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
-                public void onSuccess(DocumentSnapshot documentSnapshot) {
-                    String name = documentSnapshot.getString(documentFields.UserName);
-                    uploadPreview(name, UID , extractID , comment , view) ;
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if (snapshot.exists()) {
+                        String name = snapshot.child(documentFields.realtimeFields.fullName).getValue(String.class) ;
+                        uploadPreview(name, UID , extractID , comment , view) ;
+                    }
+                    else
+                        showCustomToast("Something went wrong" , view);
                 }
-            }).addOnFailureListener(new OnFailureListener() {
+
                 @Override
-                public void onFailure(@NonNull Exception e) {
+                public void onCancelled(@NonNull DatabaseError error) {
                     showCustomToast("Something went wrong" , view);
+                    throw error.toException() ;
                 }
             });
 
@@ -153,9 +160,6 @@ public class ImageUploadForPost extends AppCompatActivity {
                 child(documentFields.realtimePostFields.Admin).child(documentFields.realtimePostFields._Admin_.COMMENT).setValue(comment) ;
         mRealtime.child("posts").child(postUID).
                 child(documentFields.realtimePostFields.Admin).child(documentFields.realtimePostFields._Admin_.CONTENTFILE).setValue(contentfile) ;
-        // posts -> postUID -> Likes ->
-        mRealtime.child("posts").child(postUID).
-                child(documentFields.realtimePostFields.Likes).child(documentFields.realtimePostFields._Likes_.COUNT).setValue("0") ;
         /*---------------------------*/
         ImageModelClass imageModelClass = new ImageModelClass(postUID , name , file) ;
         mRealtime.child("users").child(id).

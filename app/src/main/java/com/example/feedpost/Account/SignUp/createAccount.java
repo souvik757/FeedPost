@@ -1,8 +1,10 @@
 package com.example.feedpost.Account.SignUp;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -17,14 +19,26 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.feedpost.Content.HomePage.HomePage;
 import com.example.feedpost.R;
 import com.example.feedpost.Utility.documentFields;
 import com.example.feedpost.Utility.extract;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
@@ -52,6 +66,13 @@ public class createAccount extends AppCompatActivity {
         initializeDatabase();
         setSpinnerItems();
         onClickEvents();
+
+        FirebaseUser firebaseUser = mAuth.getCurrentUser();
+        // Check condition
+        if (firebaseUser != null) {
+            // When user already sign in redirect to further activity
+            startActivity(new Intent(this, HomePage.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+        }
     }
     // 1 .
     private void initializeWidgets(){
@@ -70,13 +91,8 @@ public class createAccount extends AppCompatActivity {
     }
     // 3 .
     private void setSpinnerItems(){
-        final String[] contents = new String[]{
-                "skip" ,
-                "male" ,
-                "female"
-        } ;
-        ArrayAdapter add = new ArrayAdapter(createAccount.this ,
-                android.R.layout.simple_spinner_dropdown_item , contents) ;
+        final String[] contents = new String[]{"skip" ,"male" ,"female"} ;
+        ArrayAdapter add = new ArrayAdapter(createAccount.this ,android.R.layout.simple_spinner_dropdown_item , contents) ;
         add.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(add) ;
     }
@@ -136,6 +152,7 @@ public class createAccount extends AppCompatActivity {
                                 public void onSuccess(Void unused) {
                                     loadIndicator.setVisibility(View.GONE) ;
                                     // show custom toast
+                                    setEntryInToRealtime(usermail , fullName , gender , "" , "" , "");
                                     showCustomToast("Now , you can log in");
                                     finish() ;
                                 }
@@ -150,6 +167,23 @@ public class createAccount extends AppCompatActivity {
                 }) ;
             }
         });
+    }
+    private void setEntryInToRealtime(String userMail, String fullName , String gender ,String profilePic , String profileBg, String profileBio){
+        String childPath = FirebaseAuth.getInstance().getCurrentUser().getUid() ;
+        DatabaseReference mRef = FirebaseDatabase.getInstance().getReference();
+        // create in realtime
+        mRef.child("users").child(childPath).child(documentFields.realtimeFields.email).setValue(userMail) ;
+        mRef.child("users").child(childPath).child(documentFields.realtimeFields.fullName).setValue(fullName) ;
+        mRef.child("users").child(childPath).child(documentFields.realtimeFields.gender).setValue(gender) ;
+        if(profilePic.equals(""))
+            mRef.child("users").child(childPath).child(documentFields.realtimeFields.hasProfilePic).setValue(false) ;
+        else
+            mRef.child("users").child(childPath).child(documentFields.realtimeFields.hasProfilePic).setValue(true) ;
+        if(profileBg.equals(""))
+            mRef.child("users").child(childPath).child(documentFields.realtimeFields.hasProfileBg).setValue(false) ;
+        else
+            mRef.child("users").child(childPath).child(documentFields.realtimeFields.hasProfileBg).setValue(true) ;
+        mRef.child("users").child(childPath).child(documentFields.realtimeFields.bio).setValue(profileBio) ;
     }
     private void showCustomToast(String message){
         LayoutInflater inflater = getLayoutInflater() ;

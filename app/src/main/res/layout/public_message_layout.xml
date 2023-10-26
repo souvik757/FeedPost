@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true">
+        <androidx.cardview.widget.CardView
+            android:id="@+id/idCV"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:elevation="@dimen/commonPadding"
+            app:cardMaxElevation="@dimen/commonMargin"
+            android:layout_margin="@dimen/commonPadding"
+            app:cardCornerRadius="35dp">
+            <ImageView
+                android:id="@+id/idIVProfilePublicMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:scaleType="fitCenter"/>
+        </androidx.cardview.widget.CardView>
+        <TextView
+            android:id="@+id/idPublicMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:textSize="18sp"
+            android:layout_toEndOf="@+id/idCV"
+            android:layout_marginStart="2dp"
+            android:layout_centerVertical="true"
+            app:backgroundTint="@android:color/transparent"/>
+    </RelativeLayout>
+</RelativeLayout>

@@ -40,7 +40,6 @@ public class personalizeProfile extends AppCompatActivity {
     private EditText userBio ;
     // Firebase
     private FirebaseAuth mAuth ;
-    private DocumentReference mReference ;
     private DatabaseReference mRealTimeDatabase ;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,46 +83,20 @@ public class personalizeProfile extends AppCompatActivity {
             public void onClick(View v) {
                 String ProfileGender = String.valueOf(spinner.getSelectedItem()).trim() ;
                 String ProfileBio = String.valueOf(userBio.getText()).trim() ;
-
-                String collectionPath = extract.getDocument(mAuth.getCurrentUser().getEmail()) ;
-                String documentPath = mAuth.getCurrentUser().getUid() ;
-
-                mReference = FirebaseFirestore.getInstance().collection(collectionPath).document(documentPath);
-
-                Map<String,Object> data = new HashMap<>() ;
                 if(!TextUtils.isEmpty(userBio.getText()) && !ProfileGender.equals("skip")) {
-                    data.put(documentFields.Gender, ProfileGender);
-                    data.put(documentFields.ProfileBio, ProfileBio);
                     mRealTimeDatabase.child("users").child(mAuth.getCurrentUser().getUid()).
                             child(documentFields.realtimeFields.bio).setValue(ProfileBio) ;
                     mRealTimeDatabase.child("users").child(mAuth.getCurrentUser().getUid()).
                             child(documentFields.realtimeFields.gender).setValue(ProfileGender) ;
                 }
                 if(TextUtils.isEmpty(userBio.getText()) && !ProfileGender.equals("skip")) {
-                    data.put(documentFields.Gender, ProfileGender);
                     mRealTimeDatabase.child("users").child(mAuth.getCurrentUser().getUid()).
                             child(documentFields.realtimeFields.gender).setValue(ProfileGender) ;
                 }
                 if(!TextUtils.isEmpty(userBio.getText()) && ProfileGender.equals("skip")) {
-                    data.put(documentFields.ProfileBio, ProfileBio);
                     mRealTimeDatabase.child("users").child(mAuth.getCurrentUser().getUid()).
                             child(documentFields.realtimeFields.bio).setValue(ProfileBio) ;
                 }
-
-                mReference.update(data)
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void unused) {
-                                        Snackbar.make(v , "Changes has been made" , Snackbar.LENGTH_LONG).show() ;
-                                        finish() ;
-                                    }
-                                })
-                                        .addOnFailureListener(new OnFailureListener() {
-                                            @Override
-                                            public void onFailure(@NonNull Exception e) {
-                                                Snackbar.make(v , "Something went wrong" , Snackbar.LENGTH_LONG).show() ;
-                                            }
-                                        }) ;
                 finish() ;
             }
         }) ;

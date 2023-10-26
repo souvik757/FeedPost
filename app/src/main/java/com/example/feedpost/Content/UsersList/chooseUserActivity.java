@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.feedpost.R;
+import com.example.feedpost.Utility.DatabaseKeys;
 import com.example.feedpost.Utility.documentFields;
 import com.example.feedpost.Utility.extract;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -127,12 +128,12 @@ public class chooseUserActivity extends AppCompatActivity implements SwipeRefres
         loadingBar.setVisibility(View.VISIBLE) ;
         String email = extract.getDocument(mAuth.getCurrentUser().getEmail()) ;
         String UID = mAuth.getCurrentUser().getUid() ;
-        mReference = FirebaseFirestore.getInstance().collection(email).document(UID);
-        mReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+        ref.child(DatabaseKeys.Realtime.users).child(UID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                if(documentSnapshot.exists()){
-                    currentUserName = documentSnapshot.getString(documentFields.UserName) ;
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()){
+                    currentUserName = snapshot.child(documentFields.realtimeFields.fullName).getValue(String.class) ;
                     mRealDatabase.child("users").addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -161,8 +162,14 @@ public class chooseUserActivity extends AppCompatActivity implements SwipeRefres
                     }) ;
                 }
             }
-        }) ;
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                throw error.toException() ;
+            }
+        });
     }
+
     // 4 .
     private void initializeAdapter(){
         adapter = new UserListAdapter(chooseUserActivity.this , usersDataList) ;

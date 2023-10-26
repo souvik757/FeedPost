@@ -1,65 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:fillViewport="true"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".Account.SignIn.MainActivity">
-    <androidx.appcompat.widget.LinearLayoutCompat
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:orientation="vertical">
-        <ImageView
-            android:background="@drawable/feedpost"
-            android:layout_gravity="center"
-            android:layout_width="100dp"
-            android:layout_height="100dp"/>
-        <com.google.android.material.textview.MaterialTextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/app_name"
-            android:layout_gravity="center"/>
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/usernameET"
-                android:layout_width="match_parent"
-                android:layout_height="70dp"
-                android:layout_gravity="center"
-                android:layout_margin="16dp"
-                android:hint="@string/useremail"
-                android:inputType="textEmailAddress"
-                android:padding="12dp"/>
-        </com.google.android.material.textfield.TextInputLayout>
-        <com.google.android.material.textfield.TextInputLayout
+        android:layout_height="wrap_content">
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/layout1"
+            android:layout_marginTop="@dimen/commonMargin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:passwordToggleEnabled="true">
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/passwordET"
-                android:inputType="textPassword"
-                android:layout_width="match_parent"
-                android:layout_height="70dp"
-                android:padding="12dp"
-                android:layout_margin="16dp"
-                android:layout_gravity="center"
-                android:hint="@string/password"/>
-        </com.google.android.material.textfield.TextInputLayout>
-        <ProgressBar
-            android:id="@+id/waitingBar"
-            android:visibility="gone"
             android:layout_gravity="center"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_margin="@dimen/commonMargin"/>
-        <com.google.android.material.button.MaterialButton
-            android:onClick="SignIn"
-            android:id="@+id/buttonSignIn"
-            android:layout_width="150dp"
-            android:layout_height="90dp"
-            android:text="@string/signin"
-            android:layout_gravity="center"/>
-    </androidx.appcompat.widget.LinearLayoutCompat>
+            android:orientation="vertical">
+            <ImageView
+                android:background="@drawable/feedpost"
+                android:layout_gravity="center"
+                android:layout_width="100dp"
+                android:layout_height="100dp"/>
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/app_name"
+                android:layout_gravity="center"/>
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_marginTop="32dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/usernameET"
+                    android:layout_width="match_parent"
+                    android:layout_height="70dp"
+                    android:layout_gravity="center"
+                    android:layout_margin="16dp"
+                    android:hint="@string/useremail"
+                    android:inputType="textEmailAddress"
+                    android:padding="12dp"/>
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:passwordToggleEnabled="true">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/passwordET"
+                    android:inputType="textPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="70dp"
+                    android:padding="12dp"
+                    android:layout_margin="16dp"
+                    android:layout_gravity="center"
+                    android:hint="@string/password"/>
+            </com.google.android.material.textfield.TextInputLayout>
+            <ProgressBar
+                android:id="@+id/waitingBar"
+                android:visibility="gone"
+                android:layout_gravity="center"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_margin="@dimen/commonMargin"/>
+            <com.google.android.material.button.MaterialButton
+                android:onClick="SignIn"
+                android:id="@+id/buttonSignIn"
+                android:layout_width="100dp"
+                android:layout_height="60dp"
+                android:text="@string/signin"
+                android:layout_gravity="center"/>
+        </androidx.appcompat.widget.LinearLayoutCompat>
+    </RelativeLayout>
 </ScrollView>

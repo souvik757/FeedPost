@@ -1,6 +1,7 @@
 package com.example.feedpost.Account.SignIn;
 // 20:B8:5A:2D:A4:5C:A6:2C:67:DA:5A:E6:04:4E:DF:BC:0F:7B:90:55
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -22,22 +23,32 @@ import com.example.feedpost.R;
 import com.example.feedpost.SplashActivities.splashScreen;
 import com.example.feedpost.Utility.documentFields;
 import com.example.feedpost.Utility.extract;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class MainActivity extends AppCompatActivity {
     // widgets
     private EditText userEmail;
     private EditText passWord ;
-    private Button signIn ;
     private ProgressBar loadIndicator ;
     // firebase
     private FirebaseAuth mAuth ;
@@ -71,7 +82,6 @@ public class MainActivity extends AppCompatActivity {
     private void initializeWidgets(){
         userEmail = findViewById(R.id.usernameET) ;
         passWord = findViewById(R.id.passwordET) ;
-        signIn = findViewById(R.id.buttonSignIn) ;
         loadIndicator = findViewById(R.id.waitingBar) ;
     }
     // 2 .
@@ -93,61 +103,27 @@ public class MainActivity extends AppCompatActivity {
             loadIndicator.setVisibility(View.GONE) ;
             return ;
         }
-        String useremail = userEmail.getText().toString().trim() ;
-        String password = passWord.getText().toString().trim() ;
-        // check if we can sign in with current useremail & password
-        mAuth.signInWithEmailAndPassword(useremail , password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+        String user_email = userEmail.getText().toString().trim();
+        String password = passWord.getText().toString().trim();
+
+        // check if we can sign in with current user email & password
+        mAuth.signInWithEmailAndPassword(user_email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
-                if(task.isSuccessful()){
-                    assert mAuth.getCurrentUser() != null ;
-                    String email = extract.getDocument(mAuth.getCurrentUser().getEmail()) ;
-                    String UID = mAuth.getCurrentUser().getUid() ;
-                    mReference = FirebaseFirestore.getInstance().collection(email).document(UID);
-                    mReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                        @Override
-                        public void onSuccess(DocumentSnapshot documentSnapshot) {
-                            if (documentSnapshot.exists()){
-                                String userFullName = documentSnapshot.getString(documentFields.UserName) ;
-                                String userGender = documentSnapshot.getString(documentFields.Gender) ;
-                                String profilePic =  documentSnapshot.getString(documentFields.ProfilePic) ;
-                                String profileBg = documentSnapshot.getString(documentFields.ProfileBG) ;
-                                String profileBio = documentSnapshot.getString(documentFields.ProfileBio) ;
-                                setEntryInToRealtime(useremail , userFullName , userGender , profilePic ,profileBg,profileBio) ;
-                                loadIndicator.setVisibility(View.GONE) ;
-                            }
-                        }
-                    }) ;
-                    navigateToHomepage() ;
-                }
-                else {
+                if (task.isSuccessful()) {
+                    loadIndicator.setVisibility(View.GONE);
+                    navigateToHomepage();
+                } else {
                     // show custom toast message
                     showCustomToast("sign in failed");
                     loadIndicator.setVisibility(View.GONE);
                     // then sign up the user
-                    startActivity(new Intent(MainActivity.this , createAccount.class));
+                    startActivity(new Intent(MainActivity.this, createAccount.class));
                 }
             }
-        }) ;
+        });
     }
-
     //  .
-    private void setEntryInToRealtime(String usermail, String fullName , String gender ,String profilePic , String profileBg, String profileBio){
-        String childPath = mAuth.getCurrentUser().getUid() ;
-        // create in realtime
-        mRealDatabase.child("users").child(childPath).child(documentFields.realtimeFields.email).setValue(usermail) ;
-        mRealDatabase.child("users").child(childPath).child(documentFields.realtimeFields.fullName).setValue(fullName) ;
-        mRealDatabase.child("users").child(childPath).child(documentFields.realtimeFields.gender).setValue(gender) ;
-        if(profilePic.equals(""))
-            mRealDatabase.child("users").child(childPath).child(documentFields.realtimeFields.hasProfilePic).setValue(false) ;
-        else
-            mRealDatabase.child("users").child(childPath).child(documentFields.realtimeFields.hasProfilePic).setValue(true) ;
-        if(profileBg.equals(""))
-            mRealDatabase.child("users").child(childPath).child(documentFields.realtimeFields.hasProfileBg).setValue(false) ;
-        else
-            mRealDatabase.child("users").child(childPath).child(documentFields.realtimeFields.hasProfileBg).setValue(true) ;
-        mRealDatabase.child("users").child(childPath).child(documentFields.realtimeFields.bio).setValue(profileBio) ;
-    }
     private void navigateToHomepage(){
         String documentPath = extract.getDocument(String.valueOf(userEmail)) ;
         String currentUserID = mAuth.getCurrentUser().getUid() ;
@@ -158,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
         startActivity(i);
         finish() ;
     }
-    private void showCustomToast(String message){
+    private void showCustomToast(String message) {
         LayoutInflater inflater = getLayoutInflater() ;
         View layout = inflater.inflate(R.layout.custom_toast_layout , (ViewGroup) findViewById(R.id.containerToast)) ;
         ImageView img = layout.findViewById(R.id.imageViewToast) ;

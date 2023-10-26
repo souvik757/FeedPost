@@ -25,6 +25,7 @@ import com.example.feedpost.Account.EditAccount.EditProfileActivity;
 import com.example.feedpost.CustomImageAdapter.ImageAdapter;
 import com.example.feedpost.CustomImageAdapter.ImageModelClass;
 import com.example.feedpost.R;
+import com.example.feedpost.Utility.DatabaseKeys;
 import com.example.feedpost.Utility.documentFields;
 import com.example.feedpost.Utility.extract;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -202,80 +203,115 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
     // 4 .
     private void setViewsAndResources(View view){
         loadIndicate.setVisibility(View.VISIBLE);
-        // dummy views
-        userFollowers.setText("0");
-        userFollowings.setText("0");
-
-        photoGalary.setNestedScrollingEnabled(false) ;
-        // set resources
         FirebaseUser user = mAuth.getCurrentUser() ;
         user.reload() ;
         if(user.isEmailVerified()) {
             profileVerified.setImageResource(R.drawable.verified);
         }
-        String documentPath = extract.getDocument(mAuth.getCurrentUser().getEmail()) ;
-        String UID = mAuth.getCurrentUser().getUid() ;
-        mReference = FirebaseFirestore.getInstance().collection(documentPath).document(UID);
-        mReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                currentUser = documentSnapshot.getString(documentFields.UserName) ;
-                ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(currentUser+"'s"+" "+"Profile");
-                currentUserBio = documentSnapshot.getString(documentFields.ProfileBio) ;
-                currentUsersGender = documentSnapshot.getString(documentFields.Gender) ;
-                userName.setText(currentUser) ;
-                userBio.setText(currentUserBio) ;
-                String profilePicFile = documentSnapshot.getString(documentFields.ProfilePic) ;
-                String profileBgFile = documentSnapshot.getString(documentFields.ProfileBG) ;
-                if(profilePicFile.equals("")){
-                    if(currentUsersGender.equals("male")) {
-                        userGender.setText(getResources().getString(R.string.malePronounce));
-                        profilePicture.setImageResource(R.drawable.male) ;
-                    }
-                    else if(currentUsersGender.equals("female")) {
-                        userGender.setText(getResources().getString(R.string.femalePronounce));
-                        profilePicture.setImageResource(R.drawable.female) ;
-                    }
-                    else {
-                        userGender.setText(" ");
-                        profilePicture.setImageResource(R.drawable.skip) ;
-                    }
-                }
-                else {
-                    if(currentUsersGender.equals("male")) {
-                        userGender.setText("(he/him)");
-                    }
-                    else if(currentUsersGender.equals("female")) {
-                        userGender.setText("(she/her)");
-                    }
-                    else {
-                        userGender.setText(" ");
-                    }
-                    StorageReference ref  = FirebaseStorage.getInstance().
-                            getReference().child("userUploads").
-                            child(currentUser).
-                            child("ProfilePicture").
-                            child(profilePicFile) ;
-                    SetPicture(ref,profilePicture) ;
-                }
-                if(!profileBgFile.equals("")){
-                    StorageReference ref  = FirebaseStorage.getInstance().
-                            getReference().child("userUploads").
-                            child(currentUser).
-                            child("ProfileBanner").
-                            child(profileBgFile) ;
-                    SetPicture(ref,profileBanner) ;
-                }
-                setImageGridViews(UID , view);
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                showCustomToast("something went wrong" , view);
-            }
-        }) ;
+        String UID = FirebaseAuth.getInstance().getCurrentUser().getUid() ;
+        // set resources
+        setFollowers(UID) ;
+        setFollowings(UID) ;
+        setBioGenderName(UID) ;
+        setProfileImageViews(UID);
+        setImageGridViews(UID);
     }
-    private void setImageGridViews(String Id ,View view){
+    private void setFollowers(String UID){
+        realTimeRef.child(DatabaseKeys.Realtime.users).child(UID).child(DatabaseKeys.Realtime.follower).
+                addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                int count = (int) snapshot.getChildrenCount() ;
+                userFollowers.setText(String.valueOf(count));
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+    private void setFollowings(String UID){
+        realTimeRef.child(DatabaseKeys.Realtime.users).child(UID).child(DatabaseKeys.Realtime.following).
+                addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        int count = (int) snapshot.getChildrenCount() ;
+                        userFollowings.setText(String.valueOf(count));
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+    }
+    private void setBioGenderName(String Id){
+        realTimeRef.child(DatabaseKeys.Realtime.users).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot user : snapshot.getChildren()){
+                    String currId = user.getKey() ;
+                    if(Id.equals(currId)) {
+                        String bio, name, gender;
+                        bio = user.child(documentFields.realtimeFields.bio).getValue(String.class);
+                        name = user.child(documentFields.realtimeFields.fullName).getValue(String.class);
+                        gender = user.child(documentFields.realtimeFields.gender).getValue(String.class);
+
+                        userBio.setText(bio);
+                        userName.setText(name);
+                        userGender.setText(gender);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                throw  error.toException() ;
+            }
+        });
+    }
+    private void setProfileImageViews(String Id){
+        realTimeRef.child(DatabaseKeys.Realtime.users).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot users : snapshot.getChildren()){
+                    String currId = users.getKey() ;
+                    if(Id.equals(currId)){
+                        currentUser = users.child(documentFields.realtimeFields.fullName).getValue(String.class) ;
+                        boolean hasPicFile , hasBgFile  ;
+                        hasPicFile = users.child(documentFields.realtimeFields.hasProfilePic).getValue(Boolean.class) ;
+                        hasBgFile = users.child(documentFields.realtimeFields.hasProfileBg).getValue(Boolean.class) ;
+                        if(hasPicFile){
+                            String profilePicFile = users.child(DatabaseKeys.Realtime.profile).child(DatabaseKeys.Realtime._profile_.profilePicFile).getValue(String.class) ;
+                            StorageReference ref1 = FirebaseStorage.getInstance().getReference().child(DatabaseKeys.Storage.usersUploads)
+                                    .child(currentUser).child(DatabaseKeys.Storage.profilePicture).child(profilePicFile) ;
+                            SetPicture(ref1 , profilePicture) ;
+                        }
+                        else {
+
+                        }
+
+                        if(hasBgFile){
+                            String profileBgFile  = users.child(DatabaseKeys.Realtime.profile).child(DatabaseKeys.Realtime._profile_.profileBgFile).getValue(String.class) ;
+                            StorageReference ref1 = FirebaseStorage.getInstance().getReference().child(DatabaseKeys.Storage.usersUploads)
+                                    .child(currentUser).child(DatabaseKeys.Storage.profileBanner).child(profileBgFile) ;
+                            SetPicture(ref1 , profileBanner) ;
+                        }
+                        else {
+
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+    private void setImageGridViews(String Id){
         realTimeRef.child("users").child(Id).
                 child(documentFields.realtimeFields.PostedPicture).addValueEventListener(new ValueEventListener() {
             @Override
@@ -316,24 +352,5 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
                 // Handle any errors that occur while fetching the image
             }
         });
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-    }
-
-    //  .
-    private void showCustomToast(String message , View v){
-        LayoutInflater inflater = getLayoutInflater() ;
-        View layout = inflater.inflate(R.layout.custom_toast_layout , v.findViewById(R.id.containerToast)) ;
-        ImageView img = layout.findViewById(R.id.imageViewToast) ;
-        img.setImageResource(R.drawable.warning);
-        TextView txt = layout.findViewById(R.id.textViewToast) ;
-        txt.setText(message);
-        Toast toast = new Toast(getContext()) ;
-        toast.setDuration(Toast.LENGTH_SHORT) ;
-        toast.setView(layout);
-        toast.show() ;
     }
 }

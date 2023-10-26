@@ -1,11 +1,5 @@
 package com.example.feedpost.OthersProfile;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -16,6 +10,12 @@ import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bumptech.glide.Glide;
 import com.example.feedpost.CustomImageAdapter.ImageAdapter;
@@ -28,7 +28,6 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -38,10 +37,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.ListResult;
 import com.google.firebase.storage.StorageReference;
-
-import org.checkerframework.checker.guieffect.qual.UI;
 
 import java.util.ArrayList;
 
@@ -54,6 +50,8 @@ public class OthersProfileActivity extends AppCompatActivity implements SwipeRef
     private ProgressBar profileFetching ;
     private TextView profileName ;
     private TextView userGender ;
+    private TextView userFollower ;
+    private TextView userFollowing ;
     private TextView userBio ;
     private TextView posts ;
     private ImageView profilePic ;
@@ -110,6 +108,8 @@ public class OthersProfileActivity extends AppCompatActivity implements SwipeRef
         profileName = findViewById(R.id.usersProfileName) ;
         userGender = findViewById(R.id.usersProfileGender) ;
         userBio = findViewById(R.id.usersProfileBio) ;
+        userFollower = findViewById(R.id.usersProfileFollowerNumber) ;
+        userFollowing = findViewById(R.id.usersProfileFollowingNumber) ;
         profilePic = findViewById(R.id.usersProfilePic) ;
         profileBanner = findViewById(R.id.backgroundBanner) ;
         posts = findViewById(R.id.usersProfilePostNumber) ;
@@ -180,18 +180,16 @@ public class OthersProfileActivity extends AppCompatActivity implements SwipeRef
     private void followEvent(){
         String myID = mAuth.getCurrentUser().getUid() ;
 
-
-        mRealDatabase.child(DatabaseKeys.Realtime.users).addListenerForSingleValueEvent(new ValueEventListener() {
+        // check if already following
+        mRealDatabase.child(DatabaseKeys.Realtime.users).child(myID).child(DatabaseKeys.Realtime.following).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot usersSnapShots : snapshot.getChildren()){
-                    String uid = usersSnapShots.getKey() ;
-                    DataSnapshot followingSnapShot = usersSnapShots.child(DatabaseKeys.Realtime.following) ;
-                    for (DataSnapshot followingInfo : followingSnapShot.getChildren()){
-                        String name = followingInfo.child("name").getValue(String.class) ;
-                        if(tempUser.equals(name)){
+                if(snapshot.exists()) {
+                    for (DataSnapshot usersSnapShots : snapshot.getChildren()) {
+                        String name = usersSnapShots.child("name").getValue(String.class) ;
+                        if(name.equals(tempUser)){
+                            followBtn.setBackgroundColor(getResources().getColor(R.color.blue_dark));
                             followBtn.setText("following");
-                            followBtn.setBackgroundColor(getResources().getColor(R.color.blue_dark)) ;
                             followBtn.setClickable(false);
                         }
                     }
@@ -203,7 +201,7 @@ public class OthersProfileActivity extends AppCompatActivity implements SwipeRef
                 throw error.toException() ;
             }
         });
-
+        // progress if not follow
         followBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -219,7 +217,8 @@ public class OthersProfileActivity extends AppCompatActivity implements SwipeRef
                         String name = documentSnapshot.getString(documentFields.UserName) ;
                         updateOthersFollower(myID , name) ;
                         followBtn.setText("following");
-                        followBtn.setBackgroundColor(getResources().getColor(R.color.blue_dark)) ;
+                        followBtn.setBackgroundColor(getApplicationContext().getColor(R.color.blue_dark)) ;
+                        followBtn.setTextColor(getApplicationContext().getColor(R.color.white)) ;
                         followBtn.setClickable(false);
                     }
                 }).addOnFailureListener(new OnFailureListener() {
@@ -287,6 +286,8 @@ public class OthersProfileActivity extends AppCompatActivity implements SwipeRef
     // 5 .
     private void setViewContents(){
         profileName.setText(tempUser) ;
+        setFollower() ;
+        setFollowing() ;
         mRealDatabase.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -332,8 +333,67 @@ public class OthersProfileActivity extends AppCompatActivity implements SwipeRef
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
-        }); ;
+        });
     }
+
+    private void setFollowing() {
+        mRealDatabase.child(DatabaseKeys.Realtime.users).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot users : snapshot.getChildren()){
+                    String name = users.child(documentFields.realtimeFields.fullName).getValue(String.class) ;
+                    if(tempUser.equals(name)){
+                        users.getRef().child(DatabaseKeys.Realtime.following).addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                userFollowing.setText(String.valueOf((int)snapshot.getChildrenCount())) ;
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        }) ;
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void setFollower() {
+        mRealDatabase.child(DatabaseKeys.Realtime.users).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot users : snapshot.getChildren()){
+                    String name = users.child(documentFields.realtimeFields.fullName).getValue(String.class) ;
+                    if(tempUser.equals(name)){
+                        users.getRef().child(DatabaseKeys.Realtime.follower).addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                userFollower.setText(String.valueOf((int)snapshot.getChildrenCount())) ;
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        }) ;
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
     //  .
     private void SetPicture(StorageReference reference , ImageView imageView){
         // Fetch the download URL for the image
@@ -349,19 +409,6 @@ public class OthersProfileActivity extends AppCompatActivity implements SwipeRef
                 // Handle any errors that occur while fetching the image
             }
         });
-    }
-    //  .
-    private void showCustomToast(String message){
-        LayoutInflater inflater = getLayoutInflater() ;
-        View layout = inflater.inflate(R.layout.custom_toast_layout , (ViewGroup) findViewById(R.id.containerToast)) ;
-        ImageView img = layout.findViewById(R.id.imageViewToast) ;
-        img.setImageResource(R.drawable.warning);
-        TextView txt = layout.findViewById(R.id.textViewToast) ;
-        txt.setText(message);
-        Toast toast = new Toast(getApplicationContext()) ;
-        toast.setDuration(Toast.LENGTH_SHORT) ;
-        toast.setView(layout);
-        toast.show() ;
     }
 
     @Override

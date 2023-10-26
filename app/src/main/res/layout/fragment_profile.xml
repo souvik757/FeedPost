@@ -186,5 +186,4 @@
                 android:layout_centerHorizontal="true"/>
         </RelativeLayout>
     </ScrollView>
-
 </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
