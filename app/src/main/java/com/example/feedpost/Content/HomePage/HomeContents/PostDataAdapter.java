@@ -1,5 +1,5 @@
 package com.example.feedpost.Content.HomePage.HomeContents;
-
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -22,12 +22,15 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.feedpost.Content.HomePage.HomeContents.ComentsBottomDialog.PublicMessageAdapter;
 import com.example.feedpost.Content.HomePage.HomeContents.ComentsBottomDialog.PublicMessageModel;
+import com.example.feedpost.Content.HomePage.HomePage;
 import com.example.feedpost.OthersProfile.OthersProfileActivity;
 import com.example.feedpost.R;
 import com.example.feedpost.Utility.DatabaseKeys;
 import com.example.feedpost.Utility.documentFields;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -39,13 +42,9 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
-
-
 public class PostDataAdapter extends RecyclerView.Adapter<PostDataAdapter.PostViewHolder> {
     private Context context ;
     private ArrayList<PostDataModel> postsList ;
-
-
     public PostDataAdapter(Context context, ArrayList<PostDataModel> postsList) {
         this.context = context;
         this.postsList = postsList;
@@ -84,8 +83,6 @@ public class PostDataAdapter extends RecyclerView.Adapter<PostDataAdapter.PostVi
         }
         public void setDetails(PostDataModel dataModel){
             name.setText(dataModel.getAdminName()) ;
-            likes.setText(String.valueOf(dataModel.getCountOfLike())) ;
-            comments.setText(String.valueOf(dataModel.getCountOfComment())) ;
             comment.setText(dataModel.getAdminComment()) ;
         }
     }
@@ -154,6 +151,14 @@ public class PostDataAdapter extends RecyclerView.Adapter<PostDataAdapter.PostVi
             initBottomDialog(dataModel.getID() , dataModel.getAdminName()) ;
         });
         /**
+         * setting like count
+         */
+        setCount(holder.likes, dataModel.getID(), documentFields.realtimePostFields.Likes) ;
+        /**
+         * setting comment count
+         */
+        setCount(holder.comments, dataModel.getID(), documentFields.realtimePostFields.Comments) ;
+        /**
          * comment layout
          */
         String comment = String.valueOf(holder.comment.getText()) ;
@@ -161,14 +166,12 @@ public class PostDataAdapter extends RecyclerView.Adapter<PostDataAdapter.PostVi
             holder.comment_layout.setVisibility(View.GONE) ;
         else
             holder.comment_layout.setVisibility(View.VISIBLE) ;
+
     }
-
-
     @Override
     public int getItemCount() {
         return postsList.size() ;
     }
-
     /**
      * Most DB activities should be performed within this adapter class :
      * @param imgReference
@@ -177,7 +180,6 @@ public class PostDataAdapter extends RecyclerView.Adapter<PostDataAdapter.PostVi
      * @param context
      * @param holder
      */
-
     private void SetPicture(String imgReference , ImageView imageView ,PostDataModel dataModel ,Context context , PostViewHolder holder){
         holder.loading.setVisibility(View.VISIBLE) ;
         StorageReference reference = FirebaseStorage.getInstance().getReference().child("userUploads")
@@ -261,18 +263,34 @@ public class PostDataAdapter extends RecyclerView.Adapter<PostDataAdapter.PostVi
         FirebaseAuth mAuth = FirebaseAuth.getInstance() ;
         String myID = mAuth.getCurrentUser().getUid() ;
         DatabaseReference mRealDatabase = FirebaseDatabase.getInstance().getReference() ;
-
-        mRealDatabase.child(DatabaseKeys.Realtime.users).child(myID).child(DatabaseKeys.Realtime.following).addListenerForSingleValueEvent(new ValueEventListener() {
+        // see if user is already present in following list
+        mRealDatabase.child(DatabaseKeys.Realtime.users).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.exists()) {
-                    for (DataSnapshot usersSnapShots : snapshot.getChildren()) {
-                        String name = usersSnapShots.child("name").getValue(String.class) ;
-                        if(name.equals(tempUser)){
-                            followBtn.setBackgroundColor(context.getColor(R.color.blue_dark));
-                            followBtn.setTextColor(context.getColor(R.color.white));
-                            followBtn.setText("following");
-                            followBtn.setClickable(false);
+                if(snapshot.exists()){
+                    for (DataSnapshot users : snapshot.getChildren()){
+                        String uid = users.getKey() ;
+                        String currentName = users.child(documentFields.realtimeFields.fullName).getValue(String.class) ;
+                        if(currentName.equals(tempUser)){
+                            DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+                            ref.child(DatabaseKeys.Realtime.users).child(myID).child(DatabaseKeys.Realtime.following).child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                    if(snapshot.exists()){
+                                        followBtn.setText("following");
+                                        followBtn.setBackgroundColor(context.getColor(R.color.blue));
+                                    }
+                                    else {
+                                        followBtn.setText("follow");
+                                        followBtn.setBackgroundColor(context.getColor(R.color.green));
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {
+                                    throw error.toException() ;
+                                }
+                            });
                         }
                     }
                 }
@@ -283,27 +301,43 @@ public class PostDataAdapter extends RecyclerView.Adapter<PostDataAdapter.PostVi
                 throw error.toException() ;
             }
         });
-
-        followBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // update following of current User
-                updateMyFollowing(myID , tempUser) ;
-                // update follower of clicked user
-                String UID = mAuth.getCurrentUser().getUid() ;
-                DatabaseReference mRef = FirebaseDatabase.getInstance().getReference();
-                mRef.child(DatabaseKeys.Realtime.users).child(UID).addListenerForSingleValueEvent(new ValueEventListener() {
+        // click event
+        followBtn.setOnClickListener(view ->{
+            String textOnFollowBtn = followBtn.getText().toString() ;
+            if(textOnFollowBtn.equals("follow")){
+                followBtn.setText("following");
+                followBtn.setBackgroundColor(context.getColor(R.color.blue));
+                // add tempUser to my following
+                updateMyFollowing(myID,tempUser) ;
+                // add me in tempUser's follower
+                mRealDatabase.child(DatabaseKeys.Realtime.users).child(myID).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if (snapshot.exists()){
-                            String name = snapshot.child(documentFields.realtimeFields.fullName).getValue(String.class) ;
-                            updateOthersFollower(myID , tempUser,name) ;
-                            followBtn.setText("following");
-                            followBtn.setBackgroundColor(context.getResources().getColor(R.color.blue_dark)) ;
-                            followBtn.setClickable(false);
+                            String myName = snapshot.child(documentFields.realtimeFields.fullName).getValue(String.class) ;
+                            updateOthersFollower(myID,tempUser,myName);
                         }
                     }
-
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        throw error.toException() ;
+                    }
+                });
+            }
+            if(textOnFollowBtn.equals("following")) {
+                followBtn.setText("follow");
+                followBtn.setBackgroundColor(context.getColor(R.color.green));
+                // remove tempUser from my following
+                removeUser(myID,tempUser) ;
+                // remove me from tempUser's follower
+                mRealDatabase.child(DatabaseKeys.Realtime.users).child(myID).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()){
+                            String myName = snapshot.child(documentFields.realtimeFields.fullName).getValue(String.class) ;
+                            removeMe(myID,tempUser) ;
+                        }
+                    }
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
                         throw error.toException() ;
@@ -312,9 +346,6 @@ public class PostDataAdapter extends RecyclerView.Adapter<PostDataAdapter.PostVi
             }
         });
     }
-    /**
-     * updating my followings in realtime db
-     */
     private void updateMyFollowing(String UID , String tempUser) {
         DatabaseReference mRealDatabase = FirebaseDatabase.getInstance().getReference() ;
         mRealDatabase.child(DatabaseKeys.Realtime.users).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -323,7 +354,7 @@ public class PostDataAdapter extends RecyclerView.Adapter<PostDataAdapter.PostVi
                 for (DataSnapshot users : snapshot.getChildren()){
                     String uid = users.getKey() ;
                     // confirm uid by name
-                    String name= users.child(documentFields.realtimeFields.fullName).getValue(String.class) ;
+                    String name = users.child(documentFields.realtimeFields.fullName).getValue(String.class) ;
                     if(tempUser.equals(name)){
                         // add to my following
                         DatabaseReference ref = FirebaseDatabase.getInstance().getReference() ;
@@ -339,9 +370,6 @@ public class PostDataAdapter extends RecyclerView.Adapter<PostDataAdapter.PostVi
             }
         }); ;
     }
-    /**
-     * update others follower
-     */
     private void updateOthersFollower(String UID,String tempUser, String myName) {
         DatabaseReference mRealDatabase = FirebaseDatabase.getInstance().getReference() ;
         mRealDatabase.child(DatabaseKeys.Realtime.users).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -364,39 +392,125 @@ public class PostDataAdapter extends RecyclerView.Adapter<PostDataAdapter.PostVi
             }
         });
     }
-    /**
-     * Like event
-     */
-    private void LikeEvent(Button like, String adminName) {
-        FirebaseAuth mAuth = FirebaseAuth.getInstance() ;
-        String myID = mAuth.getCurrentUser().getUid() ;
-        DatabaseReference mRealDatabase = FirebaseDatabase.getInstance().getReference() ;
-        like.setOnClickListener(new View.OnClickListener() {
+    private void removeUser(String myUID, String tempUser){
+        DatabaseReference ref1 = FirebaseDatabase.getInstance().getReference() ;
+        ref1.child(DatabaseKeys.Realtime.users).child(myUID).child(DatabaseKeys.Realtime.following).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onClick(View v) {
-                mRealDatabase.child(DatabaseKeys.Realtime.users).child(myID).addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if (snapshot.exists()){
-                            String name = snapshot.child(documentFields.realtimeFields.fullName).getValue(String.class) ;
-                            updateOthersLike(myID , name , adminName) ;
-                            like.setBackground(context.getDrawable(R.drawable.baseline_favorite_24));
-                            like.setClickable(false) ;
-                            updateMyLike(myID , adminName) ;
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()){
+                    for (DataSnapshot followingUsers : snapshot.getChildren()){
+                        String uid = followingUsers.getKey() ;
+                        String currentUser = followingUsers.child("name").getValue(String.class) ;
+                        if(currentUser.equals(tempUser)){
+                            DatabaseReference ref2 = FirebaseDatabase.getInstance().getReference();
+                            ref2.child(DatabaseKeys.Realtime.users).child(myUID).child(DatabaseKeys.Realtime.following).child(uid).removeValue() ;
                         }
                     }
+                }
+            }
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                throw error.toException() ;
+            }
+        });
+    }
+    private void removeMe(String myUID, String tempUser){
+        DatabaseReference ref1 = FirebaseDatabase.getInstance().getReference() ;
+        ref1.child(DatabaseKeys.Realtime.users).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot users : snapshot.getChildren()){
+                    String uid = users.getKey() ;
+                    String currentUserName = users.child(documentFields.realtimeFields.fullName).getValue(String.class) ;
+                    if(tempUser.equals(currentUserName)){
+                        DatabaseReference ref2 = FirebaseDatabase.getInstance().getReference();
+                        ref2.child(DatabaseKeys.Realtime.users).child(uid).child(DatabaseKeys.Realtime.follower).child(myUID).removeValue() ;
                     }
-                });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                throw error.toException() ;
             }
         });
     }
     /**
-     * update certain indexed user's like status
+     * Like event
      */
+    private void LikeEvent(Button like, String tempUser) {
+        FirebaseAuth mAuth = FirebaseAuth.getInstance() ;
+        String myID = mAuth.getCurrentUser().getUid() ;
+        DatabaseReference mRealDatabase = FirebaseDatabase.getInstance().getReference() ;
+        // check if post is already liked by me
+        mRealDatabase.child(DatabaseKeys.Realtime.posts).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()){
+                    for (DataSnapshot posts : snapshot.getChildren()){
+                        String uid = posts.getKey() ;
+                        String currentName = posts.child(documentFields.realtimePostFields.Admin)
+                                .child(documentFields.realtimePostFields._Admin_.NAME).getValue(String.class) ;
+                        if (tempUser.equals(currentName)){
+                            DatabaseReference ref1 = FirebaseDatabase.getInstance().getReference();
+                            ref1.child(DatabaseKeys.Realtime.users).child(myID).child(DatabaseKeys.Realtime.Likes).child(uid)
+                                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                            if (snapshot.exists()){
+                                                like.setText("unlike");
+                                                like.setBackground(context.getDrawable(R.drawable.baseline_favorite_24));
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError error) {
+                                                throw error.toException() ;
+                                        }
+                                    });
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                throw error.toException() ;
+            }
+        });
+        like.setOnClickListener(view ->{
+            String txt = like.getText().toString() ;
+            if(txt.equals("like")) {
+                like.setText("unlike");
+                like.setBackground(context.getDrawable(R.drawable.baseline_favorite_24));
+                // add post to my Likes
+                updateMyLike(myID,tempUser);
+                // add me to user's post's Likes
+                mRealDatabase.child(DatabaseKeys.Realtime.users).child(myID).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()){
+                            String myName = snapshot.child(documentFields.realtimeFields.fullName).getValue(String.class) ;
+                            updateOthersLike(myID, myName, tempUser);
+                        }
+                    }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        throw error.toException() ;
+                    }
+                });
+            }
+            if(txt.equals("unlike")){
+                like.setText("like");
+                like.setBackground(context.getDrawable(R.drawable.baseline_favorite_border_24));
+                // remove post from my Like
+                removePostFromMyLike(myID, tempUser);
+                // remove me from user's post's Like
+                removeMyLikeFromUserPost(myID, tempUser);
+            }
+        });
+    }
     private void updateOthersLike(String myID , String myName , String adminName){
         DatabaseReference mRealDatabase = FirebaseDatabase.getInstance().getReference() ;
         mRealDatabase.child(DatabaseKeys.Realtime.posts).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -418,9 +532,6 @@ public class PostDataAdapter extends RecyclerView.Adapter<PostDataAdapter.PostVi
             }
         });
     }
-    /**
-     * update my like with certain indexed info's
-     */
     private void updateMyLike(String myID , String adminName){
         DatabaseReference mRealDatabase = FirebaseDatabase.getInstance().getReference() ;
         mRealDatabase.child(DatabaseKeys.Realtime.posts).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -442,8 +553,57 @@ public class PostDataAdapter extends RecyclerView.Adapter<PostDataAdapter.PostVi
             }
         });
     }
+    private void removePostFromMyLike(String myID, String tempUser){
+        DatabaseReference mRef = FirebaseDatabase.getInstance().getReference();
+        mRef.child(DatabaseKeys.Realtime.posts).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()){
+                    for (DataSnapshot posts : snapshot.getChildren()){
+                        String uid = posts.getKey() ;
+                        String currentName = posts.child(documentFields.realtimePostFields.Admin)
+                                .child(documentFields.realtimePostFields._Admin_.NAME).getValue(String.class) ;
+                        if (tempUser.equals(currentName)){
+                            DatabaseReference fRef = FirebaseDatabase.getInstance().getReference();
+                            fRef.child(DatabaseKeys.Realtime.users).child(myID).child(DatabaseKeys.Realtime.Likes).child(uid).removeValue() ;
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                throw error.toException() ;
+            }
+        });
+    }
+    private void removeMyLikeFromUserPost(String myID, String tempUser){
+        DatabaseReference mRef = FirebaseDatabase.getInstance().getReference();
+        mRef.child(DatabaseKeys.Realtime.posts).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()){
+                    for (DataSnapshot posts : snapshot.getChildren()){
+                        String uid = posts.getKey() ;
+                        String currentName = posts.child(documentFields.realtimePostFields.Admin)
+                                .child(documentFields.realtimePostFields._Admin_.NAME).getValue(String.class) ;
+                        if (tempUser.equals(currentName)){
+                            DatabaseReference fRef = FirebaseDatabase.getInstance().getReference();
+                            fRef.child(DatabaseKeys.Realtime.posts).child(uid).child(documentFields.realtimePostFields.Likes)
+                                    .child(myID).removeValue() ;
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                throw error.toException() ;
+            }
+        });
+    }
     /**
-     * navigate to personal profile of certain indexed user
+     * navigate to personal profile of user
      * @param dataModel
      */
     private void navigateToTappedProfile(PostDataModel dataModel){
@@ -475,7 +635,6 @@ public class PostDataAdapter extends RecyclerView.Adapter<PostDataAdapter.PostVi
         initBottomDialogOnClick(bottomSheetDialog, postUID, adminName, commentEDT, addCommentIV) ;
         bottomSheetDialog.show() ;
     }
-
     private void loadRecyclerViewWithData(TextView txt , ProgressBar pBar , ArrayList<PublicMessageModel> messageModelArrayList, PublicMessageAdapter adapter) {
         DatabaseReference mRealtime = FirebaseDatabase.getInstance().getReference();
         pBar.setVisibility(View.VISIBLE);
@@ -622,7 +781,20 @@ public class PostDataAdapter extends RecyclerView.Adapter<PostDataAdapter.PostVi
             }
         });
     }
-    private void showCustomToast(String message , View v , int res){
+    private void setCount(TextView txt, String postUID, String parameter) {
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child(DatabaseKeys.Realtime.posts).child(postUID).child(parameter) ;
+        ref.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                if (task.isSuccessful()){
+                    long childrenCount = task.getResult().getChildrenCount();
+                    int count = (int) childrenCount ;
+                    txt.setText(String.valueOf(count));
+                }
+            }
+        }) ;
+    }
+    private void showCustomToast(String message , View v , int res) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) ;
         View layout = inflater.inflate(R.layout.custom_toast_layout , v.findViewById(R.id.containerToast)) ;
         ImageView img = layout.findViewById(R.id.imageViewToast) ;
