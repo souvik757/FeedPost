@@ -5,7 +5,6 @@ import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -15,24 +14,24 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.feedpost.Account.EditAccount.EditProfileActivity;
 import com.example.feedpost.CustomImageAdapter.ImageAdapter;
 import com.example.feedpost.CustomImageAdapter.ImageModelClass;
+import com.example.feedpost.ImageActivity.ImageUploader.ImageUploadBackGround;
+import com.example.feedpost.ImageActivity.ImageUploader.ImageUploadForProfilePic;
 import com.example.feedpost.R;
 import com.example.feedpost.Utility.DatabaseKeys;
 import com.example.feedpost.Utility.documentFields;
-import com.example.feedpost.Utility.extract;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -41,10 +40,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.ListResult;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
@@ -72,6 +68,8 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
     private TextView userFollowings ;
     private RecyclerView photoGalary ;
     private ProgressBar loadIndicate ;
+    private LinearLayout followerLL ;
+    private LinearLayout followingLL ;
     // resources
     private String currentUser ;
     private String currentUserBio ;
@@ -148,7 +146,7 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
     private void init(){
         initializeWidgets(parentHolder) ;
         initializeDatabase() ;
-        setOnCLickListeners(parentHolder) ;
+        setOnCLickListeners() ;
         setViewsAndResources(parentHolder) ;
     }
 
@@ -171,6 +169,9 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
         userPost = v.findViewById(R.id.postNumber) ;
         userFollowers = v.findViewById(R.id.followerNumber) ;
         userFollowings = v.findViewById(R.id.followingNumber) ;
+        // layout
+        followerLL = v.findViewById(R.id.idFollowerLayout) ;
+        followingLL = v.findViewById(R.id.idFollowingLayout) ;
         // recycler view
         photoGalary = v.findViewById(R.id.usersPhotoGalary) ;
         // loading bar
@@ -191,13 +192,30 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
         storageReference = mStorage.getReference().child("userUploads") ;
     }
     // 3 .
-    private void setOnCLickListeners(View view){
+    private void setOnCLickListeners(){
         // 1 .
         edit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 getActivity().startActivity(new Intent(getContext() , EditProfileActivity.class)) ;
             }
+        });
+        // 2 .
+        profilePicture.setOnClickListener(view ->{
+            getActivity().startActivity(new Intent(getContext(), ImageUploadForProfilePic.class));
+        });
+        // 3 .
+        profileBanner.setOnClickListener(view ->{
+            getActivity().startActivity(new Intent(getContext(), ImageUploadBackGround.class));
+        });
+        // on click 'followerLL' & 'followingLL' pops up a "BottomDialogLayout" which shows follower's & following's of current user
+        // 4 .
+        followerLL.setOnClickListener(view ->{
+            Snackbar.make(view , "coming soon", Snackbar.LENGTH_SHORT).show() ;
+        });
+        // 5 .
+        followingLL.setOnClickListener(view ->{
+            Snackbar.make(view , "coming soon", Snackbar.LENGTH_SHORT).show() ;
         });
     }
     // 4 .
