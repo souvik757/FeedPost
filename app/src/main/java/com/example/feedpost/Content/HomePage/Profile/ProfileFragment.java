@@ -210,12 +210,29 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
         }
         String UID = FirebaseAuth.getInstance().getCurrentUser().getUid() ;
         // set resources
+        setPosts(UID) ;
         setFollowers(UID) ;
         setFollowings(UID) ;
         setBioGenderName(UID) ;
         setProfileImageViews(UID);
         setImageGridViews(UID);
     }
+
+    private void setPosts(String UID) {
+        realTimeRef.child(DatabaseKeys.Realtime.users).child(UID).child(documentFields.realtimeFields.PostedPicture).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                int count = (int) snapshot.getChildrenCount() ;
+                userPost.setText(String.valueOf(count));
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                throw error.toException() ;
+            }
+        }) ;
+    }
+
     private void setFollowers(String UID){
         realTimeRef.child(DatabaseKeys.Realtime.users).child(UID).child(DatabaseKeys.Realtime.follower).
                 addListenerForSingleValueEvent(new ValueEventListener() {

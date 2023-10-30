@@ -21,15 +21,29 @@
                 android:layout_height="wrap_content"
                 android:scaleType="fitCenter"/>
         </androidx.cardview.widget.CardView>
-        <TextView
-            android:id="@+id/idPublicMessage"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:singleLine="true"
-            android:textSize="18sp"
             android:layout_toEndOf="@+id/idCV"
-            android:layout_marginStart="2dp"
             android:layout_centerVertical="true"
-            app:backgroundTint="@android:color/transparent"/>
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/idMessageUserName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:layout_marginStart="2dp"
+                app:backgroundTint="@android:color/transparent"/>
+            <TextView
+                android:id="@+id/idPublicMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:textSize="12sp"
+                android:layout_marginStart="2dp"
+                app:backgroundTint="@android:color/transparent"/>
+        </LinearLayout>
     </RelativeLayout>
 </RelativeLayout>

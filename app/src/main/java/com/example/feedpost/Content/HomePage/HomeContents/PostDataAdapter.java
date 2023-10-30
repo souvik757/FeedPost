@@ -1,5 +1,4 @@
 package com.example.feedpost.Content.HomePage.HomeContents;
-import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -12,6 +11,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,7 +22,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.feedpost.Content.HomePage.HomeContents.ComentsBottomDialog.PublicMessageAdapter;
 import com.example.feedpost.Content.HomePage.HomeContents.ComentsBottomDialog.PublicMessageModel;
-import com.example.feedpost.Content.HomePage.HomePage;
 import com.example.feedpost.OthersProfile.OthersProfileActivity;
 import com.example.feedpost.R;
 import com.example.feedpost.Utility.DatabaseKeys;
@@ -148,7 +147,7 @@ public class PostDataAdapter extends RecyclerView.Adapter<PostDataAdapter.PostVi
          * comment button
          */
         holder.btnComment.setOnClickListener(view ->{
-            initBottomDialog(dataModel.getID() , dataModel.getAdminName()) ;
+            initBottomDialog(dataModel, holder) ;
         });
         /**
          * setting like count
@@ -611,10 +610,16 @@ public class PostDataAdapter extends RecyclerView.Adapter<PostDataAdapter.PostVi
         i.putExtra("TappedUsersName" , dataModel.getAdminName()) ;
         context.startActivity(i) ;
     }
-    private void initBottomDialog(String postUID , String adminName){
+    private void initBottomDialog(PostDataModel model, PostViewHolder holder){
+        String postUID = model.getID() ;
+        String adminName = model.getAdminName() ;
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(context) ;
         bottomSheetDialog.setContentView(R.layout.messege_bottom_dialoge_layout) ;
         // widgets
+        RelativeLayout RL1 = bottomSheetDialog.findViewById(R.id.idRL1) ;
+        ImageView adminProfile = bottomSheetDialog.findViewById(R.id.idIVAdminProfile) ;
+        TextView postAdminName = bottomSheetDialog.findViewById(R.id.idTVAdminName) ;
+        TextView adminMessage = bottomSheetDialog.findViewById(R.id.idTVAdminMessage) ;
         TextView noCommentTxtView = bottomSheetDialog.findViewById(R.id.idTVNoComment) ;
         ProgressBar progressBar = bottomSheetDialog.findViewById(R.id.idPBForComment) ;
         ImageView profileIV = bottomSheetDialog.findViewById(R.id.idIVProfile) ;
@@ -629,41 +634,50 @@ public class PostDataAdapter extends RecyclerView.Adapter<PostDataAdapter.PostVi
         recyclerView.setNestedScrollingEnabled(false) ;
         recyclerView.setHasFixedSize(true) ;
 
-
-        loadRecyclerViewWithData(noCommentTxtView , progressBar , messageModelArrayList ,adapter) ;
+        setAdminResources(model,holder,RL1,adminProfile,postAdminName,adminMessage) ;
+        loadRecyclerViewWithData(noCommentTxtView , progressBar , messageModelArrayList ,adapter, adminName) ;
         picForBottomDialogLayout(profileIV);
-        initBottomDialogOnClick(bottomSheetDialog, postUID, adminName, commentEDT, addCommentIV) ;
+        initBottomDialogOnClick(bottomSheetDialog, postUID, adminName, commentEDT, profileIV, addCommentIV, adapter) ;
         bottomSheetDialog.show() ;
     }
-    private void loadRecyclerViewWithData(TextView txt , ProgressBar pBar , ArrayList<PublicMessageModel> messageModelArrayList, PublicMessageAdapter adapter) {
+
+    private void setAdminResources(PostDataModel model, PostViewHolder holder,RelativeLayout rl,ImageView adminProfile, TextView postAdminName, TextView adminMessage) {
+        String message = String.valueOf(holder.comment.getText()) ;
+        if(message.isEmpty())
+            rl.setVisibility(View.GONE);
+        else {
+            SetProfilePics(model.getID(), adminProfile, context) ;
+            postAdminName.setText(String.valueOf(model.getAdminName()));
+            adminMessage.setText(String.valueOf(model.getAdminComment())) ;
+        }
+    }
+
+    private void loadRecyclerViewWithData(TextView txt , ProgressBar pBar , ArrayList<PublicMessageModel> messageModelArrayList, PublicMessageAdapter adapter, String adminName) {
         DatabaseReference mRealtime = FirebaseDatabase.getInstance().getReference();
         pBar.setVisibility(View.VISIBLE);
-        mRealtime.child(DatabaseKeys.Realtime.posts).addListenerForSingleValueEvent(new ValueEventListener() {
+        mRealtime.child(DatabaseKeys.Realtime.posts).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.exists()){
-
-                    for (DataSnapshot dataSnapshot : snapshot.getChildren()){
-                        String UID = dataSnapshot.getKey() ;
+                for (DataSnapshot posts : snapshot.getChildren()){
+                    String uid = posts.getKey() ;
+                    String currentName = posts.child(documentFields.realtimePostFields.Admin).child(documentFields.realtimePostFields._Admin_.NAME).getValue(String.class) ;
+                    if(adminName.equals(currentName)){
                         DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
-                        ref.child(DatabaseKeys.Realtime.posts).child(UID).child(DatabaseKeys.Realtime.Comments).addListenerForSingleValueEvent(new ValueEventListener() {
+                        ref.child(DatabaseKeys.Realtime.posts).child(uid).child(documentFields.realtimePostFields.Comments).addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                if(snapshot.exists()){
-                                    for (DataSnapshot commentedUser : snapshot.getChildren()){
-                                        String commenterName = commentedUser.child("name").getValue(String.class) ;
-                                        String comment = commentedUser.child(DatabaseKeys.Realtime._Comments_.comment).getValue(String.class) ;
-                                        PublicMessageModel model = new PublicMessageModel(commenterName , comment) ;
-                                        messageModelArrayList.add(model) ;
-                                        pBar.setVisibility(View.GONE);
-                                        adapter.notifyDataSetChanged();
-                                    }
-                                }
-                                else
-                                {
+                                int count = (int) snapshot.getChildrenCount() ;
+                                if(count == 0)
+                                    txt.setVisibility(View.VISIBLE) ;
+                                messageModelArrayList.clear();
+                                for (DataSnapshot commentedUser : snapshot.getChildren()){
+                                    String commenterName = commentedUser.child("name").getValue(String.class) ;
+                                    String comment = commentedUser.child(DatabaseKeys.Realtime._Comments_.comment).getValue(String.class) ;
+                                    PublicMessageModel model = new PublicMessageModel(commenterName , comment) ;
+                                    messageModelArrayList.add(model) ;
                                     pBar.setVisibility(View.GONE);
-                                    txt.setVisibility(View.VISIBLE);
                                 }
+                                adapter.notifyDataSetChanged();
                             }
 
                             @Override
@@ -673,18 +687,13 @@ public class PostDataAdapter extends RecyclerView.Adapter<PostDataAdapter.PostVi
                         });
                     }
                 }
-                else
-                {
-                    pBar.setVisibility(View.GONE);
-                    txt.setVisibility(View.VISIBLE);
-                }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 throw error.toException() ;
             }
-        });
+        }) ;
     }
     private void picForBottomDialogLayout(ImageView imageView){
         String UID = FirebaseAuth.getInstance().getCurrentUser().getUid() ;
@@ -723,7 +732,7 @@ public class PostDataAdapter extends RecyclerView.Adapter<PostDataAdapter.PostVi
         });
     }
 
-    private void initBottomDialogOnClick(BottomSheetDialog bottomSheetDialog,String postUID, String adminName, EditText editText, ImageView button){
+    private void initBottomDialogOnClick(BottomSheetDialog bottomSheetDialog,String postUID, String adminName, EditText editText, ImageView buttonIV, ImageView button, PublicMessageAdapter adapter){
         String myID = FirebaseAuth.getInstance().getCurrentUser().getUid() ;
 
         button.setOnClickListener(view ->{
@@ -745,6 +754,7 @@ public class PostDataAdapter extends RecyclerView.Adapter<PostDataAdapter.PostVi
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                                         if (snapshot.exists()){
+
                                             String myName = snapshot.child(documentFields.realtimeFields.fullName).getValue(String.class) ;
                                             DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
                                             ref.child(DatabaseKeys.Realtime.posts).child(uid).
@@ -754,12 +764,13 @@ public class PostDataAdapter extends RecyclerView.Adapter<PostDataAdapter.PostVi
                                                     child(DatabaseKeys.Realtime.Comments).child(myID).
                                                     child(DatabaseKeys.Realtime._Comments_.comment).setValue(comment) ;
                                             ref.child(DatabaseKeys.Realtime.users).child(myID).child(DatabaseKeys.Realtime.Comments).child(postUID).child("name").setValue(adminName) ;
+                                            adapter.notifyDataSetChanged() ;
                                         }
                                     }
 
                                     @Override
                                     public void onCancelled(@NonNull DatabaseError error) {
-
+                                        throw error.toException() ;
                                     }
                                 });
                             }
@@ -772,6 +783,7 @@ public class PostDataAdapter extends RecyclerView.Adapter<PostDataAdapter.PostVi
                     }
                 });
             }
+
         });
 
         bottomSheetDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {

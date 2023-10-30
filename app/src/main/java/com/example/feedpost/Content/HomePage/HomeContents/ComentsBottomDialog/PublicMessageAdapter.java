@@ -1,6 +1,7 @@
 package com.example.feedpost.Content.HomePage.HomeContents.ComentsBottomDialog;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,11 +14,14 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.feedpost.Content.HomePage.HomeContents.PostDataModel;
+import com.example.feedpost.OthersProfile.OthersProfileActivity;
 import com.example.feedpost.R;
 import com.example.feedpost.Utility.DatabaseKeys;
 import com.example.feedpost.Utility.documentFields;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -40,10 +44,12 @@ public class PublicMessageAdapter extends RecyclerView.Adapter<PublicMessageAdap
     class ViewHolder extends RecyclerView.ViewHolder{
 
         private ImageView ivProfile ;
+        private TextView tvUserName ;
         private TextView tvMessage ;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             ivProfile = itemView.findViewById(R.id.idIVProfilePublicMessage) ;
+            tvUserName = itemView.findViewById(R.id.idMessageUserName) ;
             tvMessage = itemView.findViewById(R.id.idPublicMessage) ;
         }
     }
@@ -57,11 +63,13 @@ public class PublicMessageAdapter extends RecyclerView.Adapter<PublicMessageAdap
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         // get the model
         PublicMessageModel model = messageList.get(position) ;
-        // setting message text area
-        holder.tvMessage.setText(model.getMessage());
-        // setting profile picture
+        String message = model.getMessage() ;
         String name = model.getName() ;
+        // setting resources
+        holder.tvMessage.setText(message);
+        holder.tvUserName.setText(name);
         setProfilePicture(name,holder.ivProfile) ;
+        setOnCLickMethods(name,holder) ;
     }
 
     @Override
@@ -121,5 +129,33 @@ public class PublicMessageAdapter extends RecyclerView.Adapter<PublicMessageAdap
                 throw error.toException() ;
             }
         });
+    }
+    private void setOnCLickMethods(String name, ViewHolder holder){
+        holder.ivProfile.setOnClickListener(view ->{
+            navigateToTappedProfile(name);
+        });
+        holder.tvUserName.setOnClickListener(view ->{
+            navigateToTappedProfile(name);
+        });
+    }
+    private void navigateToTappedProfile(String name){
+        String UID = FirebaseAuth.getInstance().getCurrentUser().getUid() ;
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+        ref.child(DatabaseKeys.Realtime.users).child(UID).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                String currentName = snapshot.child(documentFields.realtimeFields.fullName).getValue(String.class) ;
+                if(!name.equals(currentName)){
+                    Intent i = new Intent(context , OthersProfileActivity.class) ;
+                    i.putExtra("TappedUsersName" , name) ;
+                    context.startActivity(i) ;
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                throw error.toException() ;
+            }
+        }) ;
     }
 }

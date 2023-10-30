@@ -21,12 +21,64 @@
         android:layout_alignParentTop="false"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
+    <RelativeLayout
+        android:id="@+id/idRL1"
+        android:layout_below="@+id/txtComment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true">
+        <androidx.cardview.widget.CardView
+            android:id="@+id/idCV1"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:elevation="@dimen/commonPadding"
+            app:cardMaxElevation="@dimen/commonMargin"
+            android:layout_margin="@dimen/commonPadding"
+            app:cardCornerRadius="35dp">
+            <ImageView
+                android:id="@+id/idIVAdminProfile"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:scaleType="fitCenter"/>
+        </androidx.cardview.widget.CardView>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/idCV1"
+            android:layout_centerVertical="true"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/idTVAdminName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:layout_marginStart="2dp"
+                app:backgroundTint="@android:color/transparent"/>
+            <TextView
+                android:id="@+id/idTVAdminMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:textSize="12sp"
+                android:layout_marginStart="2dp"
+                app:backgroundTint="@android:color/transparent"/>
+        </LinearLayout>
+    </RelativeLayout>
+    <ImageView
+        android:id="@+id/separator"
+        android:layout_margin="4dp"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@+id/idRL1"
+        android:background="@color/blue"/>
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/idCommentRV"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_below="@+id/txtComment"/>
+        android:layout_below="@+id/separator"/>
     <RelativeLayout
         android:id="@+id/Rv"
         android:layout_width="match_parent"
@@ -50,7 +102,7 @@
         <EditText
             android:id="@+id/idEdtComment"
             android:hint="Type to comment . . ."
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:singleLine="true"
             android:textSize="15sp"
@@ -62,7 +114,7 @@
             android:id="@+id/idBtnSendMessage"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:layout_marginEnd="3dp"
+            android:layout_marginEnd="8dp"
             android:background="@drawable/baseline_send_24"
             android:backgroundTint="@color/blue"
             android:layout_alignParentEnd="true"

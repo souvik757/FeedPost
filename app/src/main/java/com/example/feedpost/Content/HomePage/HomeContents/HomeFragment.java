@@ -141,6 +141,7 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         mRealDatabase.child("posts").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                postArrayList.clear() ;
 
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()){
                     String postUID = dataSnapshot.getKey() ;
