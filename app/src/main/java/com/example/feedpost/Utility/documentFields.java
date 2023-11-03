@@ -44,5 +44,10 @@ public class documentFields {
             public static final String name = "name" ;
         }
     }
+    public static class rawDataFields {
+        public static final String userName = "userName" ;
+        public static final String adapterPosition = "TappedAdapterPosition" ;
+        public static final String currentUserName = "TappedUsersName" ;
+    }
 }
 

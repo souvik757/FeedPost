@@ -21,6 +21,8 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.feedpost.Account.EditAccount.EditProfileActivity;
+import com.example.feedpost.Content.HomePage.Profile.RefinedList.RefinedModelClass;
+import com.example.feedpost.Content.HomePage.Profile.RefinedList.RefinedUserAdapter;
 import com.example.feedpost.CustomImageAdapter.ImageAdapter;
 import com.example.feedpost.CustomImageAdapter.ImageModelClass;
 import com.example.feedpost.ImageActivity.ImageUploader.ImageUploadBackGround;
@@ -30,8 +32,8 @@ import com.example.feedpost.Utility.DatabaseKeys;
 import com.example.feedpost.Utility.documentFields;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -66,10 +68,13 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
     private TextView userPost ;
     private TextView userFollowers ;
     private TextView userFollowings ;
+    private TextView nullProfilePic ;
+    private TextView nullProfileBg ;
     private RecyclerView photoGalary ;
     private ProgressBar loadIndicate ;
     private LinearLayout followerLL ;
     private LinearLayout followingLL ;
+
     // resources
     private String currentUser ;
     private String currentUserBio ;
@@ -169,6 +174,8 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
         userPost = v.findViewById(R.id.postNumber) ;
         userFollowers = v.findViewById(R.id.followerNumber) ;
         userFollowings = v.findViewById(R.id.followingNumber) ;
+        nullProfilePic = v.findViewById(R.id.idTvNoProfilePicture) ;
+        nullProfileBg = v.findViewById(R.id.idTvNoProfileBg) ;
         // layout
         followerLL = v.findViewById(R.id.idFollowerLayout) ;
         followingLL = v.findViewById(R.id.idFollowingLayout) ;
@@ -211,11 +218,11 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
         // on click 'followerLL' & 'followingLL' pops up a "BottomDialogLayout" which shows follower's & following's of current user
         // 4 .
         followerLL.setOnClickListener(view ->{
-            Snackbar.make(view , "coming soon", Snackbar.LENGTH_SHORT).show() ;
+            initBottomDialog("follower");
         });
         // 5 .
         followingLL.setOnClickListener(view ->{
-            Snackbar.make(view , "coming soon", Snackbar.LENGTH_SHORT).show() ;
+            initBottomDialog("following");
         });
     }
     // 4 .
@@ -262,7 +269,7 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
+                throw error.toException() ;
             }
         });
     }
@@ -277,7 +284,7 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
-
+                        throw error.toException() ;
                     }
                 });
     }
@@ -323,9 +330,8 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
                                     .child(currentUser).child(DatabaseKeys.Storage.profilePicture).child(profilePicFile) ;
                             SetPicture(ref1 , profilePicture) ;
                         }
-                        else {
-
-                        }
+                        else
+                            nullProfilePic.setVisibility(View.VISIBLE) ;
 
                         if(hasBgFile){
                             String profileBgFile  = users.child(DatabaseKeys.Realtime.profile).child(DatabaseKeys.Realtime._profile_.profileBgFile).getValue(String.class) ;
@@ -333,16 +339,15 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
                                     .child(currentUser).child(DatabaseKeys.Storage.profileBanner).child(profileBgFile) ;
                             SetPicture(ref1 , profileBanner) ;
                         }
-                        else {
-
-                        }
+                        else
+                            nullProfileBg.setVisibility(View.VISIBLE) ;
                     }
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
+                throw error.toException() ;
             }
         });
     }
@@ -352,6 +357,7 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()) {
+                    imageList.clear() ;
                     for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                         String postUid = dataSnapshot.child("postUid").getValue(String.class);
                         String name = dataSnapshot.child("userName").getValue(String.class);
@@ -359,9 +365,9 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
                         ImageModelClass imageModelClass = new ImageModelClass(postUid, name, file);
                         imageList.add(imageModelClass);
                         userPost.setText(String.valueOf(photoGalary.getAdapter().getItemCount()));
-                        loadIndicate.setVisibility(View.GONE);
-                        adapter.notifyDataSetChanged();
                     }
+                    loadIndicate.setVisibility(View.GONE);
+                    adapter.notifyDataSetChanged();
                 }
                 else
                     loadIndicate.setVisibility(View.GONE) ;
@@ -369,7 +375,7 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
+                throw error.toException() ;
             }
         });
     }
@@ -385,7 +391,82 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
             @Override
             public void onFailure(@NonNull Exception e) {
                 // Handle any errors that occur while fetching the image
+                e.printStackTrace() ;
             }
+        });
+    }
+    // 5 .
+    private void initBottomDialog(String parameter){
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(getContext()) ;
+        bottomSheetDialog.setContentView(R.layout.refined_list_bottom_dialog_layout) ;
+        // widgets
+        TextView txtParam = bottomSheetDialog.findViewById(R.id.txtParameter) ;
+        RecyclerView userListRV = bottomSheetDialog.findViewById(R.id.idRVRefinedList) ;
+        // resources for rv
+        ArrayList<RefinedModelClass> userArrayList = new ArrayList<>() ;
+        GridLayoutManager layoutManager = new GridLayoutManager(getContext() , 2) ;
+        RefinedUserAdapter refinedUserAdapter = new RefinedUserAdapter(getContext(), userArrayList) ;
+        userListRV.setLayoutManager(layoutManager) ;
+        userListRV.setAdapter(refinedUserAdapter) ;
+        // setting views
+        setResources(parameter,txtParam, userArrayList,refinedUserAdapter) ;
+        // on click & dismiss
+        setOnCLick(bottomSheetDialog) ;
+        // show the layout
+        bottomSheetDialog.show() ;
+    }
+
+    private void setResources(String parameter, TextView txtParam, ArrayList<RefinedModelClass> userArrayList, RefinedUserAdapter refinedUserAdapter) {
+        txtParam.setText(String.valueOf(parameter)) ;
+        String UID = FirebaseAuth.getInstance().getCurrentUser().getUid() ;
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference() ;
+        ref.child(DatabaseKeys.Realtime.users).child(UID).child(parameter).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()){
+                    for (DataSnapshot users : snapshot.getChildren()){
+                        String uid = users.getKey() ;
+                        String name = users.child("name").getValue(String.class) ;
+                        DatabaseReference ref1 = FirebaseDatabase.getInstance().getReference();
+                        ref1.child(DatabaseKeys.Realtime.users).child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                if(snapshot.exists()){
+                                    boolean hasProfilePic = snapshot.child(documentFields.realtimeFields.hasProfilePic).getValue(Boolean.class) ;
+                                    if(hasProfilePic){
+                                        String profilePicFile = snapshot
+                                                .child(DatabaseKeys.Realtime.profile)
+                                                .child(DatabaseKeys.Realtime._profile_.profilePicFile).getValue(String.class) ;
+                                        RefinedModelClass model = new RefinedModelClass(parameter, name, profilePicFile) ;
+                                        userArrayList.add(model) ;
+                                    }
+                                    else {
+                                        RefinedModelClass model = new RefinedModelClass(parameter, name, "") ;
+                                        userArrayList.add(model) ;
+                                    }
+                                    refinedUserAdapter.notifyDataSetChanged() ;
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+                                throw error.toException() ;
+                            }
+                        });
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                throw error.toException() ;
+            }
+        });
+    }
+
+    private void setOnCLick(BottomSheetDialog bottomSheetDialog) {
+        bottomSheetDialog.setOnDismissListener(view ->{
+
         });
     }
 }

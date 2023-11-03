@@ -254,7 +254,7 @@ public class PostDataAdapter extends RecyclerView.Adapter<PostDataAdapter.PostVi
         });
     }
     /**
-     * handels like event as per both end user
+     * handel like event as per both end user
      * @param followBtn
      * @param tempUser
      */
@@ -607,7 +607,7 @@ public class PostDataAdapter extends RecyclerView.Adapter<PostDataAdapter.PostVi
      */
     private void navigateToTappedProfile(PostDataModel dataModel){
         Intent i = new Intent(context , OthersProfileActivity.class) ;
-        i.putExtra("TappedUsersName" , dataModel.getAdminName()) ;
+        i.putExtra(documentFields.rawDataFields.currentUserName , dataModel.getAdminName()) ;
         context.startActivity(i) ;
     }
     private void initBottomDialog(PostDataModel model, PostViewHolder holder){
@@ -675,8 +675,9 @@ public class PostDataAdapter extends RecyclerView.Adapter<PostDataAdapter.PostVi
                                     String comment = commentedUser.child(DatabaseKeys.Realtime._Comments_.comment).getValue(String.class) ;
                                     PublicMessageModel model = new PublicMessageModel(commenterName , comment) ;
                                     messageModelArrayList.add(model) ;
-                                    pBar.setVisibility(View.GONE);
+                                    pBar.setVisibility(View.GONE) ;
                                 }
+                                pBar.setVisibility(View.GONE) ;
                                 adapter.notifyDataSetChanged();
                             }
 

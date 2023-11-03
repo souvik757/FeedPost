@@ -36,6 +36,8 @@ public class DatabaseKeys {
      * Storage
      */
     public static final class Storage{
+        public static final String noPicture = "NoPicture" ;
+        public static final String user = "user.png" ;
         public static final String usersUploads = "userUploads" ;
         public static final String profilePicture = "ProfilePicture" ;
         public static final String profileBanner  = "ProfileBanner" ;
