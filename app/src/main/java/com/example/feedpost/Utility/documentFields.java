@@ -21,6 +21,11 @@ public class documentFields {
         public static final String hasProfilePic = "hasProfilePic"  ;
         public static final String hasProfileBg = "hasProfileBg"  ;
         public static final String PostedPicture = "PostedPicture" ;
+        public static class _PostedPicture_ {
+            public static final String fileName = "fileName" ;
+            public static final String postUid = "postUid" ;
+            public static final String userName = "userName" ;
+        }
     }
 
     /**

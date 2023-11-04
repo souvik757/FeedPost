@@ -4,17 +4,28 @@ public class PictureModel {
     /**
      * 1 . post id
      * 2 . user name
-     * 3 . user profile image file
-     * 4 . post image file
+     * 3 . user Comment
+     * 4 . user profile image file
+     * 5 . post image file
      */
     private String postID ;
     private String userName ;
+    private String userComment ;
     private String profilePictureFile ;
     private String postPictureFile ;
 
-    public PictureModel(String postID, String userName, String profilePictureFile, String postPictureFile) {
+    public String getUserComment() {
+        return userComment;
+    }
+
+    public void setUserComment(String userComment) {
+        this.userComment = userComment;
+    }
+
+    public PictureModel(String postID, String userName, String userComment, String profilePictureFile, String postPictureFile) {
         this.postID = postID;
         this.userName = userName;
+        this.userComment = userComment ;
         this.profilePictureFile = profilePictureFile;
         this.postPictureFile = postPictureFile;
     }

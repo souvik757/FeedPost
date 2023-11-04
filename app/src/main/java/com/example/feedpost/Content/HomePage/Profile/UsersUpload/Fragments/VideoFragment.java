@@ -2,6 +2,7 @@ package com.example.feedpost.Content.HomePage.Profile.UsersUpload.Fragments;
 
 import android.os.Bundle;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -61,6 +62,7 @@ public class VideoFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("My Uploads");
         return inflater.inflate(R.layout.fragment_video, container, false);
     }
 }

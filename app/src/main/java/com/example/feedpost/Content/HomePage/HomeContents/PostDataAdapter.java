@@ -234,8 +234,12 @@ public class PostDataAdapter extends RecyclerView.Adapter<PostDataAdapter.PostVi
                                     });
 
                                 }
-                                else
-                                    imageView.setImageResource(R.drawable.skip) ;
+                                else{
+                                    StorageReference storageReference = FirebaseStorage.getInstance().getReference() ;
+                                    storageReference.child(DatabaseKeys.Storage.noPicture).child(DatabaseKeys.Storage.user).getDownloadUrl().addOnSuccessListener(uri ->{
+                                        Glide.with(context).load(uri).into(imageView) ;
+                                    }) ;
+                                }
                             }
                         }
 

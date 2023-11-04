@@ -41,6 +41,9 @@ import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 
+/**
+ * Have to change totally ....
+ */
 public class OthersProfileActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
     // layouts
     private SwipeRefreshLayout swipeRefreshLayout ;

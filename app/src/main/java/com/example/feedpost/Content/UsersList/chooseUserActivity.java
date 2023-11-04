@@ -64,13 +64,11 @@ public class chooseUserActivity extends AppCompatActivity implements SwipeRefres
         swipeRefreshLayout.setOnRefreshListener(this);
 
     }
-
     @Override
     public void onRefresh() {
         init() ;
         swipeRefreshLayout.setRefreshing(false);
     }
-
     private void init(){
         initializeWidgetsAndVariables() ;
         initializeDatabase() ;
@@ -106,9 +104,7 @@ public class chooseUserActivity extends AppCompatActivity implements SwipeRefres
             if(item.getProfileName().toLowerCase().contains(text.toLowerCase()))
                 filteredList.add(item) ;
         }
-        if (filteredList.isEmpty())
-            showCustomToast("no data found");
-        else
+        if (!filteredList.isEmpty())
             adapter.filterList(filteredList) ;
     }
 
@@ -134,22 +130,21 @@ public class chooseUserActivity extends AppCompatActivity implements SwipeRefres
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()){
                     currentUserName = snapshot.child(documentFields.realtimeFields.fullName).getValue(String.class) ;
-                    mRealDatabase.child("users").addValueEventListener(new ValueEventListener() {
+                    mRealDatabase.child(DatabaseKeys.Realtime.users).addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            for (DataSnapshot dataSnapshot : snapshot.getChildren()){
-                                UserListModel userListModel = new UserListModel();
-                                String name = dataSnapshot.child(documentFields.realtimeFields.fullName).getValue(String.class) ;
+                            for (DataSnapshot users : snapshot.getChildren()){
+                                String uid = users.getKey() ;
+                                String name = users.child(documentFields.realtimeFields.fullName).getValue(String.class) ;
                                 if (!currentUserName.equals(name)) {
-                                    userListModel.setProfileName(name);
-                                    String gender = dataSnapshot.child(documentFields.realtimeFields.gender).getValue(String.class) ;
-                                    if(gender.equals("male"))
-                                        userListModel.setProfilePic(R.drawable.male);
-                                    if(gender.equals("female"))
-                                        userListModel.setProfilePic(R.drawable.female) ;
-                                    if(gender.equals("skip") || gender.isEmpty())
-                                        userListModel.setProfilePic(R.drawable.skip) ;
-                                    usersDataList.add(userListModel) ;
+                                    String profilePicFile ;
+                                    boolean hasProfilePic = users.child(documentFields.realtimeFields.hasProfilePic).getValue(Boolean.class) ;
+                                    if(hasProfilePic)
+                                        profilePicFile = users.child(DatabaseKeys.Realtime.profile).child(DatabaseKeys.Realtime._profile_.profilePicFile).getValue(String.class) ;
+                                    else
+                                        profilePicFile = DatabaseKeys.Storage.user ;
+                                    UserListModel model = new UserListModel(profilePicFile,name) ;
+                                    usersDataList.add(model) ;
                                     loadingBar.setVisibility(View.GONE) ;
                                     adapter.notifyDataSetChanged() ;
                                 }
@@ -157,7 +152,7 @@ public class chooseUserActivity extends AppCompatActivity implements SwipeRefres
                         }
                         @Override
                         public void onCancelled(@NonNull DatabaseError error) {
-
+                            throw error.toException() ;
                         }
                     }) ;
                 }

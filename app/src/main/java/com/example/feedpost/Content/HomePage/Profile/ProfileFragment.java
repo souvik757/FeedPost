@@ -325,6 +325,7 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
                         hasPicFile = users.child(documentFields.realtimeFields.hasProfilePic).getValue(Boolean.class) ;
                         hasBgFile = users.child(documentFields.realtimeFields.hasProfileBg).getValue(Boolean.class) ;
                         if(hasPicFile){
+                            nullProfilePic.setVisibility(View.GONE) ;
                             String profilePicFile = users.child(DatabaseKeys.Realtime.profile).child(DatabaseKeys.Realtime._profile_.profilePicFile).getValue(String.class) ;
                             StorageReference ref1 = FirebaseStorage.getInstance().getReference().child(DatabaseKeys.Storage.usersUploads)
                                     .child(currentUser).child(DatabaseKeys.Storage.profilePicture).child(profilePicFile) ;
@@ -334,6 +335,7 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
                             nullProfilePic.setVisibility(View.VISIBLE) ;
 
                         if(hasBgFile){
+                            nullProfileBg.setVisibility(View.GONE) ;
                             String profileBgFile  = users.child(DatabaseKeys.Realtime.profile).child(DatabaseKeys.Realtime._profile_.profileBgFile).getValue(String.class) ;
                             StorageReference ref1 = FirebaseStorage.getInstance().getReference().child(DatabaseKeys.Storage.usersUploads)
                                     .child(currentUser).child(DatabaseKeys.Storage.profileBanner).child(profileBgFile) ;
@@ -352,11 +354,13 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
         });
     }
     private void setImageGridViews(String Id){
-        realTimeRef.child("users").child(Id).
+        realTimeRef.child(DatabaseKeys.Realtime.users).child(Id).
                 child(documentFields.realtimeFields.PostedPicture).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()) {
+                    int count = (int) snapshot.getChildrenCount() ;
+                    userPost.setText(String.valueOf(count));
                     imageList.clear() ;
                     for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                         String postUid = dataSnapshot.child("postUid").getValue(String.class);
@@ -364,7 +368,6 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
                         String file = dataSnapshot.child("fileName").getValue(String.class);
                         ImageModelClass imageModelClass = new ImageModelClass(postUid, name, file);
                         imageList.add(imageModelClass);
-                        userPost.setText(String.valueOf(photoGalary.getAdapter().getItemCount()));
                     }
                     loadIndicate.setVisibility(View.GONE);
                     adapter.notifyDataSetChanged();

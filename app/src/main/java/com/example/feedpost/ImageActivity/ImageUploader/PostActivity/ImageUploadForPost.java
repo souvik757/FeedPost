@@ -137,6 +137,7 @@ public class ImageUploadForPost extends AppCompatActivity {
                 int length = fileName.length() ;
                 setEntryToRealtime(postUID , UID , name , extractID , comment , fileName.substring(0,length-4) , fileName);
                 progressBar.setVisibility(View.GONE);
+                finish() ;
 
             }
         }).addOnFailureListener(new OnFailureListener() {

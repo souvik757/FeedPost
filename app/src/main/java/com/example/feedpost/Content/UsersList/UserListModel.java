@@ -4,23 +4,19 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 
 public class UserListModel {
-    private int profilePic ;
+    private String profilePicFile ;
     private String profileName ;
-
-    public UserListModel() {
-    }
-
-    public UserListModel(int profilePic, String profileName) {
-        this.profilePic = profilePic;
+    public UserListModel(String profilePicFile, String profileName) {
+        this.profilePicFile = profilePicFile;
         this.profileName = profileName;
     }
 
-    public int getProfilePic() {
-        return profilePic;
+    public String getProfilePic() {
+        return profilePicFile;
     }
 
-    public void setProfilePic(int profilePic) {
-        this.profilePic = profilePic;
+    public void setProfilePic(String profilePicFile) {
+        this.profilePicFile = profilePicFile;
     }
 
     public String getProfileName() {
