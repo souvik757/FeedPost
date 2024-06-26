@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
@@ -94,7 +95,7 @@ public class OthersProfileActivity extends AppCompatActivity implements SwipeRef
         initializeDatabase() ;
         setProfileModelArrayList() ;
         setViewContents() ;
-        followEvent() ;
+        followEvent(followBtn , tempUser);
     }
     // 1 .
     private void initializeWidgetsAndVariables(){
@@ -179,21 +180,38 @@ public class OthersProfileActivity extends AppCompatActivity implements SwipeRef
             }
         }) ;
     }
-    // 4 .
-    private void followEvent(){
+    private void followEvent(Button followBtn, String tempUser){
+        FirebaseAuth mAuth = FirebaseAuth.getInstance() ;
         String myID = mAuth.getCurrentUser().getUid() ;
-
-        // check if already following
-        mRealDatabase.child(DatabaseKeys.Realtime.users).child(myID).child(DatabaseKeys.Realtime.following).addListenerForSingleValueEvent(new ValueEventListener() {
+        DatabaseReference mRealDatabase = FirebaseDatabase.getInstance().getReference() ;
+        // see if user is already present in following list
+        mRealDatabase.child(DatabaseKeys.Realtime.users).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.exists()) {
-                    for (DataSnapshot usersSnapShots : snapshot.getChildren()) {
-                        String name = usersSnapShots.child("name").getValue(String.class) ;
-                        if(name.equals(tempUser)){
-                            followBtn.setBackgroundColor(getResources().getColor(R.color.blue_dark));
-                            followBtn.setText("following");
-                            followBtn.setClickable(false);
+                if(snapshot.exists()){
+                    for (DataSnapshot users : snapshot.getChildren()){
+                        String uid = users.getKey() ;
+                        String currentName = users.child(documentFields.realtimeFields.fullName).getValue(String.class) ;
+                        if(currentName.equals(tempUser)){
+                            DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+                            ref.child(DatabaseKeys.Realtime.users).child(myID).child(DatabaseKeys.Realtime.following).child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                    if(snapshot.exists()){
+                                        followBtn.setText("following");
+                                        followBtn.setBackgroundColor(getApplicationContext().getColor(R.color.blue));
+                                    }
+                                    else {
+                                        followBtn.setText("follow");
+                                        followBtn.setBackgroundColor(getApplicationContext().getColor(R.color.green));
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {
+                                    throw error.toException() ;
+                                }
+                            });
                         }
                     }
                 }
@@ -204,47 +222,60 @@ public class OthersProfileActivity extends AppCompatActivity implements SwipeRef
                 throw error.toException() ;
             }
         });
-        // progress if not follow
-        followBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // update following of current User
-                updateMyFollowing(myID) ;
-                // update follower of clicked user
-                String documentPath = extract.getDocument(mAuth.getCurrentUser().getEmail()) ;
-                String UID = mAuth.getCurrentUser().getUid() ;
-                storeReference = FirebaseFirestore.getInstance().collection(documentPath).document(UID);
-                storeReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+        // click event
+        followBtn.setOnClickListener(view ->{
+            String textOnFollowBtn = followBtn.getText().toString() ;
+            if(textOnFollowBtn.equals("follow")){
+                followBtn.setText("following");
+                followBtn.setBackgroundColor(getApplicationContext().getColor(R.color.blue));
+                // add tempUser to my following
+                updateMyFollowing(myID,tempUser) ;
+                // add me in tempUser's follower
+                mRealDatabase.child(DatabaseKeys.Realtime.users).child(myID).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-                        String name = documentSnapshot.getString(documentFields.UserName) ;
-                        updateOthersFollower(myID , name) ;
-                        followBtn.setText("following");
-                        followBtn.setBackgroundColor(getApplicationContext().getColor(R.color.blue_dark)) ;
-                        followBtn.setTextColor(getApplicationContext().getColor(R.color.white)) ;
-                        followBtn.setClickable(false);
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()){
+                            String myName = snapshot.child(documentFields.realtimeFields.fullName).getValue(String.class) ;
+                            updateOthersFollower(myID,tempUser,myName);
+                        }
                     }
-                }).addOnFailureListener(new OnFailureListener() {
                     @Override
-                    public void onFailure(@NonNull Exception e) {
-                        e.printStackTrace() ;
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        throw error.toException() ;
                     }
-                }) ;
+                });
+            }
+            if(textOnFollowBtn.equals("following")) {
+                followBtn.setText("follow");
+                followBtn.setBackgroundColor(getApplicationContext().getColor(R.color.green));
+                // remove tempUser from my following
+                removeUser(myID,tempUser) ;
+                // remove me from tempUser's follower
+                mRealDatabase.child(DatabaseKeys.Realtime.users).child(myID).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()){
+                            String myName = snapshot.child(documentFields.realtimeFields.fullName).getValue(String.class) ;
+                            removeMe(myID,tempUser) ;
+                        }
+                    }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        throw error.toException() ;
+                    }
+                });
             }
         });
     }
-
-    /**
-     * updating my followings in realtime db
-     */
-    private void updateMyFollowing(String UID) {
+    private void updateMyFollowing(String UID , String tempUser) {
+        DatabaseReference mRealDatabase = FirebaseDatabase.getInstance().getReference() ;
         mRealDatabase.child(DatabaseKeys.Realtime.users).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot users : snapshot.getChildren()){
                     String uid = users.getKey() ;
                     // confirm uid by name
-                    String name= users.child(documentFields.realtimeFields.fullName).getValue(String.class) ;
+                    String name = users.child(documentFields.realtimeFields.fullName).getValue(String.class) ;
                     if(tempUser.equals(name)){
                         // add to my following
                         DatabaseReference ref = FirebaseDatabase.getInstance().getReference() ;
@@ -260,11 +291,8 @@ public class OthersProfileActivity extends AppCompatActivity implements SwipeRef
             }
         }); ;
     }
-
-    /**
-     * update others follower
-     */
-    private void updateOthersFollower(String UID,String myName) {
+    private void updateOthersFollower(String UID,String tempUser, String myName) {
+        DatabaseReference mRealDatabase = FirebaseDatabase.getInstance().getReference() ;
         mRealDatabase.child(DatabaseKeys.Realtime.users).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -283,10 +311,52 @@ public class OthersProfileActivity extends AppCompatActivity implements SwipeRef
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
-        }); ;
+        });
     }
+    private void removeUser(String myUID, String tempUser){
+        DatabaseReference ref1 = FirebaseDatabase.getInstance().getReference() ;
+        ref1.child(DatabaseKeys.Realtime.users).child(myUID).child(DatabaseKeys.Realtime.following).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()){
+                    for (DataSnapshot followingUsers : snapshot.getChildren()){
+                        String uid = followingUsers.getKey() ;
+                        String currentUser = followingUsers.child("name").getValue(String.class) ;
+                        if(currentUser.equals(tempUser)){
+                            DatabaseReference ref2 = FirebaseDatabase.getInstance().getReference();
+                            ref2.child(DatabaseKeys.Realtime.users).child(myUID).child(DatabaseKeys.Realtime.following).child(uid).removeValue() ;
+                        }
+                    }
+                }
+            }
 
-    // 5 .
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                throw error.toException() ;
+            }
+        });
+    }
+    private void removeMe(String myUID, String tempUser){
+        DatabaseReference ref1 = FirebaseDatabase.getInstance().getReference() ;
+        ref1.child(DatabaseKeys.Realtime.users).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot users : snapshot.getChildren()){
+                    String uid = users.getKey() ;
+                    String currentUserName = users.child(documentFields.realtimeFields.fullName).getValue(String.class) ;
+                    if(tempUser.equals(currentUserName)){
+                        DatabaseReference ref2 = FirebaseDatabase.getInstance().getReference();
+                        ref2.child(DatabaseKeys.Realtime.users).child(uid).child(DatabaseKeys.Realtime.follower).child(myUID).removeValue() ;
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                throw error.toException() ;
+            }
+        });
+    }
     private void setViewContents(){
         profileName.setText(tempUser) ;
         setFollower() ;
@@ -416,6 +486,7 @@ public class OthersProfileActivity extends AppCompatActivity implements SwipeRef
 
     @Override
     public void onBackPressed() {
-        finish() ;
+        super.onBackPressed();
+        finish();
     }
 }

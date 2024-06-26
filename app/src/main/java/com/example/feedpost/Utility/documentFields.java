@@ -20,6 +20,7 @@ public class documentFields {
         public static final String bio = "bio" ;
         public static final String hasProfilePic = "hasProfilePic"  ;
         public static final String hasProfileBg = "hasProfileBg"  ;
+        public static final String hasFollowing = "hasFollowing"  ;
         public static final String PostedPicture = "PostedPicture" ;
         public static class _PostedPicture_ {
             public static final String fileName = "fileName" ;

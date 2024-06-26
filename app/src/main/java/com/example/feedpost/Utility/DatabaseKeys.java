@@ -27,12 +27,6 @@ public class DatabaseKeys {
         }
     }
     /**
-     * Fire-Store References
-     */
-    public static final class FireStore{
-
-    }
-    /**
      * Storage
      */
     public static final class Storage{

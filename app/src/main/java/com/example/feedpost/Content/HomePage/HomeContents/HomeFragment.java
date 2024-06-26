@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.feedpost.R;
+import com.example.feedpost.Utility.DatabaseKeys;
 import com.example.feedpost.Utility.documentFields;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.firebase.auth.FirebaseAuth;
@@ -109,7 +110,7 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         initializeWidgets(parentHolder) ;
         initializeRawResources(parentHolder) ;
         initializeDatabase() ;
-        fillListWithData() ;
+        fillListWithFollowing();
     }
     // 1 .
     private void initializeWidgets(View view){
@@ -133,6 +134,72 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     private void initializeDatabase(){
         mAuth = FirebaseAuth.getInstance() ;
         mRealDatabase = FirebaseDatabase.getInstance().getReference() ;
+    }
+    private void fillListWithFollowing(){
+        // loading bar start . . .
+        loadingBar.setVisibility(View.VISIBLE);
+        String UID = mAuth.getCurrentUser().getUid() ;
+        mRealDatabase.child(DatabaseKeys.Realtime.users).child(UID).child(DatabaseKeys.Realtime.following).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()){
+                    for (DataSnapshot followings : snapshot.getChildren()){
+                        String followingUID = followings.getKey() ;
+                        mRealDatabase.child(DatabaseKeys.Realtime.posts).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                postArrayList.clear() ;
+
+                                for (DataSnapshot dataSnapshot : snapshot.getChildren()){
+                                    String postUID = dataSnapshot.getKey() ;
+                                    PostDataModel dataModel = new PostDataModel() ;
+                                    String Uid = dataSnapshot.child(documentFields.realtimePostFields.Admin)
+                                            .child(documentFields.realtimePostFields._Admin_.ID).getValue(String.class) ;
+                                    if(followingUID.equals(Uid)){
+                                        String extractedId = dataSnapshot.child(documentFields.realtimePostFields.Admin)
+                                                .child(documentFields.realtimePostFields._Admin_.EXTRACED_EMAIL).getValue(String.class) ;
+                                        /* text elements */
+                                        // - name
+                                        String name = dataSnapshot.child(documentFields.realtimePostFields.Admin)
+                                                .child(documentFields.realtimePostFields._Admin_.NAME).getValue(String.class) ;
+                                        // - comment
+                                        String comment = dataSnapshot.child(documentFields.realtimePostFields.Admin)
+                                                .child(documentFields.realtimePostFields._Admin_.COMMENT).getValue(String.class) ;
+                                        // - image files
+                                        String image = dataSnapshot.child(documentFields.realtimePostFields.Admin)
+                                                .child(documentFields.realtimePostFields._Admin_.CONTENTFILE).getValue(String.class)+".jpg" ;
+
+                                        dataModel.setID(postUID) ;
+                                        dataModel.setExtractID(extractedId) ;
+                                        dataModel.setAdminName(name) ;
+                                        dataModel.setAdminComment(comment) ;
+                                        dataModel.setRef(image) ;
+
+                                        postArrayList.add(dataModel) ;
+                                        loadingBar.setVisibility(View.GONE) ;
+
+                                        // animation component
+                                        AnimateRecyclerView(R.anim.animate_scale_in , getContext() , recyclerView) ;
+
+                                        adapter.notifyDataSetChanged() ;
+                                    }
+                                }
+                            }
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+                                throw error.toException() ;
+                            }
+                        });
+                    }
+                }else {
+                    fillListWithData() ;
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                throw error.toException() ;
+            }
+        });
     }
     // 4 .
     private void fillListWithData(){

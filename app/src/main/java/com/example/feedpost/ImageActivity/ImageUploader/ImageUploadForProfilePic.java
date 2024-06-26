@@ -102,12 +102,12 @@ public class ImageUploadForProfilePic extends AppCompatActivity {
                               public void onFailure(@NonNull Exception exception) {
                                   // Handle unsuccessful uploads
                                   loadingBar.setVisibility(View.GONE);
-                                  showCustomToast("Something went wrong 1", view);
+                                  showCustomToast("Something went wrong", view);
                               }
                           }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                               @Override
                               public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                  showCustomToast("Successfully 2", view);
+                                  showCustomToast("Successfully", view);
                                   mRealtime.child("users").child(UID).child(documentFields.realtimeFields.hasProfilePic).setValue(true);
                                   mRealtime.child("users").child(UID).child("profile").child("profilePicFile").setValue(fileName) ;
                                   loadingBar.setVisibility(View.GONE);
@@ -158,56 +158,3 @@ public class ImageUploadForProfilePic extends AppCompatActivity {
         toast.show() ;
     }
 }
-/**
- *                     if(documentSnapshot.exists()){
- *                         showCustomToast("Successfully 1 + "+documentSnapshot.getString(documentFields.UserName), view);
- *                         String name = documentSnapshot.getString(documentFields.UserName);
- *                         // Get the data from an ImageView as bytes
- *                         profilePicture.setDrawingCacheEnabled(true);
- *                         profilePicture.buildDrawingCache();
- *                         Bitmap bitmap = ((BitmapDrawable) profilePicture.getDrawable()).getBitmap();
- *                         ByteArrayOutputStream baos = new ByteArrayOutputStream();
- *                         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
- *                         byte[] data = baos.toByteArray();
- *                         UploadTask uploadTask = mStorage.getReference().child("userUploads").child(name).child("ProfilePicture")
- *                                 .child(fileName).putBytes(data);
- *                         uploadTask.addOnFailureListener(new OnFailureListener() {
- *                             @Override
- *                             public void onFailure(@NonNull Exception exception) {
- *                                 // Handle unsuccessful uploads
- *                                 loadingBar.setVisibility(View.GONE);
- *                                 showCustomToast("Something went wrong 1", view);
- *                             }
- *                         }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
- *                             @Override
- *                             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
- *                                 showCustomToast("Successfully 2", view);
- *                                 // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
- *                                 // ...
- *                                 Map<String, Object> data = new HashMap<>();
- *                                 data.put(documentFields.ProfilePic, fileName);
- *                                 mReference.update(data).addOnSuccessListener(new OnSuccessListener<Void>() {
- *                                     @Override
- *                                     public void onSuccess(Void unused) {
- *                                         mRealtime.child("users").child(UID).
- *                                                 child(documentFields.realtimeFields.hasProfilePic).
- *                                                 setValue(true);
- *                                         mRealtime.child("users").child(UID).
- *                                                 child("profile").
- *                                                 child("profilePicFile").
- *                                                 setValue(fileName) ;
- *                                         loadingBar.setVisibility(View.GONE);
- *                                         finish();
- *                                     }
- *                                 }).addOnFailureListener(new OnFailureListener() {
- *                                     @Override
- *                                     public void onFailure(@NonNull Exception e) {
- *                                         loadingBar.setVisibility(View.GONE);
- *                                         showCustomToast("Something went wrong 2", view);
- *                                     }
- *                                 });
- *
- *                             }
- *                         });
- *                     }
- */
